@@ -30,11 +30,11 @@ during and after.
 ├── README.md
 ├── services/                     # Node.js microservices (Docker)
 │   ├── waf/                      # Reverse proxy + WAF, rate limiting, sole ingress
-│   ├── frontend/                 # Donation page (served behind the WAF)
 │   ├── auth-service/             # Authentication
 │   ├── payment-api/              # Business API: donations, transactions
 │   ├── psp-simulator/            # Simulated payment provider (replaces Stripe)
 │   └── remediation-engine/       # Alert → playbook → test transaction (scoped Docker access)
+├── frontend/                     # Donation page (React+Tailwind, served behind the WAF)
 ├── dashboard/                    # React + Tailwind supervision UI (before/during/after)
 ├── ai/
 │   ├── anomaly-detection/        # ML over Prometheus metrics + Loki logs
@@ -72,7 +72,8 @@ during and after.
 Backend implemented: `auth-service`, `payment-api`, `psp-simulator` (Node.js),
 MariaDB schema and a Docker Compose dev stack with phpMyAdmin — run it from
 [infra/](infra/README.md). Covers accounts/profile, donations, transaction
-history, leaderboard and donor titles. Still to build: frontend, dashboard,
+history, leaderboard and donor titles. `frontend` is wired to these APIs
+(see [frontend/README.md](frontend/README.md)). Still to build: dashboard,
 observability, WAF, AI detection/RAG, red-team and governance docs.
 
 ## Deliverables
