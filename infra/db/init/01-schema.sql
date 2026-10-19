@@ -1,0 +1,44 @@
+CREATE DATABASE IF NOT EXISTS xijin_pink CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE xijin_pink;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  display_name VARCHAR(80) NOT NULL,
+  bio VARCHAR(500) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED DEFAULT NULL,
+  reference VARCHAR(64) NOT NULL UNIQUE,
+  amount_cents INT UNSIGNED NOT NULL,
+  currency CHAR(3) NOT NULL DEFAULT 'EUR',
+  status ENUM('pending', 'paid', 'failed') NOT NULL DEFAULT 'pending',
+  donor_email VARCHAR(255) DEFAULT NULL,
+  psp_reference VARCHAR(64) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_transactions_user FOREIGN KEY (user_id)
+    REFERENCES users (id) ON DELETE SET NULL,
+  INDEX idx_transactions_user (user_id),
+  INDEX idx_transactions_status (status)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS titles (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  label VARCHAR(60) NOT NULL,
+  threshold_cents INT UNSIGNED NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+INSERT INTO titles (label, threshold_cents) VALUES
+  ('Soutien', 0),
+  ('Donateur', 5000),
+  ('Grand donateur', 20000),
+  ('Bienfaiteur', 50000),
+  ('Mécène', 100000),
+  ('Ambassadeur Xijin Pink', 500000)
+ON DUPLICATE KEY UPDATE label = VALUES(label);

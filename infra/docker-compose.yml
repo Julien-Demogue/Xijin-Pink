@@ -1,0 +1,94 @@
+name: xijin-pink
+
+services:
+  mariadb:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - donnees_mariadb:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [interne]
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks: [interne]
+
+  auth-service:
+    build: ../services/auth-service
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - "3001:3001"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks: [interne]
+
+  payment-api:
+    build: ../services/payment-api
+    restart: unless-stopped
+    environment:
+      PORT: 3002
+      JWT_SECRET: ${JWT_SECRET}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      PSP_URL: http://psp-simulator:3003
+      PSP_WEBHOOK_SECRET: ${PSP_WEBHOOK_SECRET}
+      PSP_RETURN_URL: ${PUBLIC_FRONT_URL}
+    ports:
+      - "3002:3002"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      psp-simulator:
+        condition: service_started
+    networks: [interne]
+
+  psp-simulator:
+    build: ../services/psp-simulator
+    restart: unless-stopped
+    environment:
+      PORT: 3003
+      PAYMENT_API_URL: http://payment-api:3002
+      PSP_WEBHOOK_SECRET: ${PSP_WEBHOOK_SECRET}
+      PUBLIC_URL: ${PUBLIC_PSP_URL}
+      DEFAULT_RETURN_URL: ${PUBLIC_FRONT_URL}
+    ports:
+      - "3003:3003"
+    networks: [interne]
+
+volumes:
+  donnees_mariadb:
+
+networks:
+  interne:
+    driver: bridge
