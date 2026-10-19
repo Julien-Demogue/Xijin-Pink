@@ -31,8 +31,8 @@ function validate(values: FormState): FormErrors {
   if (!EMAIL_REGEX.test(values.email.trim())) {
     errors.email = "Adresse email invalide.";
   }
-  if (values.password.length < 8 || !/\d/.test(values.password)) {
-    errors.password = "Le mot de passe doit contenir au moins 8 caractères et un chiffre.";
+  if (values.password.length < 8) {
+    errors.password = "Le mot de passe doit contenir au moins 8 caractères.";
   }
   if (values.password !== values.confirmPassword) {
     errors.confirmPassword = "Les mots de passe ne correspondent pas.";
@@ -53,7 +53,7 @@ export function RegisterPage() {
   const [serverError, setServerError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const validationErrors = validate(values);
     setErrors(validationErrors);
@@ -61,7 +61,11 @@ export function RegisterPage() {
     if (Object.keys(validationErrors).length > 0) return;
 
     setIsSubmitting(true);
-    const result = register(values);
+    const result = await register({
+      email: values.email.trim(),
+      password: values.password,
+      displayName: values.name.trim(),
+    });
     setIsSubmitting(false);
 
     if (!result.ok) {
@@ -110,7 +114,7 @@ export function RegisterPage() {
             value={values.password}
             onChange={(event) => setValues({ ...values, password: event.target.value })}
             error={errors.password}
-            hint="8 caractères minimum, avec au moins un chiffre."
+            hint="8 caractères minimum."
           />
 
           <Input

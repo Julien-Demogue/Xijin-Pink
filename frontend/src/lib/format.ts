@@ -6,6 +6,10 @@ export function formatEuros(amount: number): string {
   }).format(amount);
 }
 
+export function formatCents(amountCents: number): string {
+  return formatEuros(amountCents / 100);
+}
+
 export function formatDate(iso: string): string {
   return new Intl.DateTimeFormat("fr-FR", {
     day: "2-digit",

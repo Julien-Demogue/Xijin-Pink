@@ -59,8 +59,8 @@ export function Navbar() {
           {isAuthenticated && currentUser ? (
             <>
               <NavLink to="/profil" className="flex items-center gap-2">
-                <Avatar name={currentUser.name} size="sm" />
-                <span className="text-sm font-medium text-gray-700">{currentUser.name}</span>
+                <Avatar name={currentUser.displayName} size="sm" />
+                <span className="text-sm font-medium text-gray-700">{currentUser.displayName}</span>
               </NavLink>
               <Button variant="ghost" size="sm" onClick={handleLogout} leftIcon={<LogOut className="h-4 w-4" />}>
                 Déconnexion
@@ -118,7 +118,7 @@ export function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
-                    <Avatar name={currentUser.name} size="sm" />
+                    <Avatar name={currentUser.displayName} size="sm" />
                     Mon profil
                   </NavLink>
                   <Button variant="outline" onClick={handleLogout} leftIcon={<LogOut className="h-4 w-4" />}>

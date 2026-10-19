@@ -20,10 +20,10 @@ export function LoginPage() {
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
-    const result = login(email, password);
+    const result = await login(email, password);
     setIsSubmitting(false);
 
     if (!result.ok) {

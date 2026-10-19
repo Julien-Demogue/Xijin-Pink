@@ -72,7 +72,8 @@ during and after.
 Backend implemented: `auth-service`, `payment-api`, `psp-simulator` (Node.js),
 MariaDB schema and a Docker Compose dev stack with phpMyAdmin — run it from
 [infra/](infra/README.md). Covers accounts/profile, donations, transaction
-history, leaderboard and donor titles. Still to build: frontend, dashboard,
+history, leaderboard and donor titles. `frontend` is wired to these APIs
+(see [frontend/README.md](frontend/README.md)). Still to build: dashboard,
 observability, WAF, AI detection/RAG, red-team and governance docs.
 
 ## Deliverables

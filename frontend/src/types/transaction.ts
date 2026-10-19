@@ -1,12 +1,9 @@
 export type TransactionStatus = "pending" | "paid" | "failed";
 
 export interface Transaction {
-  id: string;
-  donorEmail: string;
-  amount: number;
-  currency: "EUR";
+  reference: string;
+  amountCents: number;
+  currency: string;
   status: TransactionStatus;
   createdAt: string;
-  updatedAt: string;
-  message?: string;
 }

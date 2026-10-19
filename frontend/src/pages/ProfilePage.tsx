@@ -8,33 +8,32 @@ import { Avatar } from "@/components/ui/Avatar";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { useAuth } from "@/context/AuthContext";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export function ProfilePage() {
   const { currentUser, updateProfile } = useAuth();
-  const [name, setName] = useState(currentUser?.name ?? "");
-  const [email, setEmail] = useState(currentUser?.email ?? "");
+  const [displayName, setDisplayName] = useState(currentUser?.displayName ?? "");
   const [bio, setBio] = useState(currentUser?.bio ?? "");
-  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
-  const [serverError, setServerError] = useState<string>();
+  const [error, setError] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!currentUser) return null;
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSuccessMessage(undefined);
-    setServerError(undefined);
+    setError(undefined);
 
-    const nextErrors: { name?: string; email?: string } = {};
-    if (name.trim().length < 2) nextErrors.name = "Veuillez indiquer votre nom.";
-    if (!EMAIL_REGEX.test(email.trim())) nextErrors.email = "Adresse email invalide.";
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+    if (displayName.trim().length < 2) {
+      setError("Veuillez indiquer votre nom.");
+      return;
+    }
 
-    const result = updateProfile({ name, email, bio });
+    setIsSubmitting(true);
+    const result = await updateProfile({ displayName: displayName.trim(), bio });
+    setIsSubmitting(false);
+
     if (!result.ok) {
-      setServerError(result.error);
+      setError(result.error);
       return;
     }
     setSuccessMessage("Profil mis à jour avec succès.");
@@ -43,7 +42,7 @@ export function ProfilePage() {
   return (
     <PageContainer className="max-w-xl py-16">
       <div className="mb-8 flex items-center gap-4">
-        <Avatar name={currentUser.name} size="lg" />
+        <Avatar name={currentUser.displayName} size="lg" />
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mon profil</h1>
           <p className="text-sm text-gray-500">Gérez vos informations personnelles.</p>
@@ -53,23 +52,23 @@ export function ProfilePage() {
       <Card variant="elevated">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {successMessage && <Alert tone="success">{successMessage}</Alert>}
-          {serverError && <Alert tone="error">{serverError}</Alert>}
+          {error && <Alert tone="error">{error}</Alert>}
 
           <Input
             label="Nom complet"
-            name="name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            error={errors.name}
+            name="displayName"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            disabled={isSubmitting}
           />
 
           <Input
             label="Adresse email"
             type="email"
             name="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            error={errors.email}
+            value={currentUser.email}
+            disabled
+            hint="L'email ne peut pas être modifié."
           />
 
           <Textarea
@@ -81,9 +80,10 @@ export function ProfilePage() {
             value={bio}
             onChange={(event) => setBio(event.target.value)}
             hint={`${bio.length}/280 caractères`}
+            disabled={isSubmitting}
           />
 
-          <Button type="submit" fullWidth>
+          <Button type="submit" isLoading={isSubmitting} fullWidth>
             Enregistrer
           </Button>
         </form>

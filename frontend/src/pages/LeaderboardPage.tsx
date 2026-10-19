@@ -1,18 +1,19 @@
-import { MOCK_LEADERBOARD } from "@/data/mockLeaderboard";
+import { useEffect, useState } from "react";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Table, type TableColumn } from "@/components/ui/Table";
 import { Avatar } from "@/components/ui/Avatar";
+import { Spinner } from "@/components/ui/Spinner";
+import { Alert } from "@/components/ui/Alert";
 import { DonorTierBadge } from "@/components/features/leaderboard/DonorTierBadge";
-import { formatEuros } from "@/lib/format";
+import { formatCents } from "@/lib/format";
+import { ApiError, donationsLeaderboard } from "@/lib/apiClient";
 import type { LeaderboardEntry } from "@/types/leaderboard";
 import { cn } from "@/lib/cn";
-
-const sortedEntries = [...MOCK_LEADERBOARD].sort((a, b) => b.totalDonated - a.totalDonated);
 
 const columns: Array<TableColumn<LeaderboardEntry>> = [
   {
     header: "Rang",
-    render: (_row, index) => <span className="font-semibold text-gray-400">#{index + 1}</span>,
+    render: (row) => <span className="font-semibold text-gray-400">#{row.rank}</span>,
   },
   {
     header: "Donateur",
@@ -25,15 +26,24 @@ const columns: Array<TableColumn<LeaderboardEntry>> = [
   },
   {
     header: "Total donné",
-    render: (row) => <span className="font-semibold text-gray-900">{formatEuros(row.totalDonated)}</span>,
+    render: (row) => <span className="font-semibold text-gray-900">{formatCents(row.totalCents)}</span>,
   },
   {
     header: "Titre",
-    render: (row) => <DonorTierBadge totalDonated={row.totalDonated} />,
+    render: (row) => <DonorTierBadge title={row.title} />,
   },
 ];
 
 export function LeaderboardPage() {
+  const [entries, setEntries] = useState<LeaderboardEntry[] | null>(null);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    donationsLeaderboard()
+      .then(setEntries)
+      .catch((err) => setError(err instanceof ApiError ? err.message : "Impossible de charger le classement."));
+  }, []);
+
   return (
     <PageContainer className="py-16">
       <div className="mb-8 text-center">
@@ -43,12 +53,26 @@ export function LeaderboardPage() {
         </p>
       </div>
 
-      <Table
-        columns={columns}
-        rows={sortedEntries}
-        rowKey={(row) => row.id}
-        rowClassName={(_row, index) => cn(index < 3 && "bg-brand-primary-soft/40")}
-      />
+      {error && <Alert tone="error">{error}</Alert>}
+
+      {!error && !entries && (
+        <div className="flex justify-center py-12">
+          <Spinner />
+        </div>
+      )}
+
+      {entries && entries.length === 0 && (
+        <p className="text-center text-gray-500">Aucun don confirmé pour le moment.</p>
+      )}
+
+      {entries && entries.length > 0 && (
+        <Table
+          columns={columns}
+          rows={entries}
+          rowKey={(row) => String(row.rank)}
+          rowClassName={(row) => cn(row.rank <= 3 && "bg-brand-primary-soft/40")}
+        />
+      )}
     </PageContainer>
   );
 }

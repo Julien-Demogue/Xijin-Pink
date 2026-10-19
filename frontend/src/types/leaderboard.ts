@@ -1,6 +1,7 @@
 export interface LeaderboardEntry {
-  id: string;
+  rank: number;
   displayName: string;
-  totalDonated: number;
-  lastDonationAt: string;
+  totalCents: number;
+  donationCount: number;
+  title: string | null;
 }

@@ -10,10 +10,12 @@ import { HistoryPage } from "@/pages/HistoryPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { ProfilePage } from "@/pages/ProfilePage";
+import { DonationReturnPage } from "@/pages/DonationReturnPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 function GuestOnlyRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return null;
   if (isAuthenticated) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
@@ -25,6 +27,7 @@ export function AppRouter() {
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="don" element={<DonationPage />} />
+          <Route path="don/retour" element={<DonationReturnPage />} />
           <Route path="classement" element={<LeaderboardPage />} />
           <Route
             path="connexion"

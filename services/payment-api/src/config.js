@@ -27,7 +27,7 @@ export const config = {
   psp: {
     url: read("PSP_URL", "http://psp-simulator:3003"),
     webhookSecret: read("PSP_WEBHOOK_SECRET"),
-    returnUrl: read("PSP_RETURN_URL", "http://localhost:5173"),
+    returnUrl: read("PSP_RETURN_URL", "http://localhost:5173/don/retour"),
   },
   donation: {
     minAmount: 100,
