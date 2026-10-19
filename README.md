@@ -6,7 +6,7 @@ Initial scaffold for an **Octobre Rose donation platform** with a companion **AI
 
 ```text
 .
-├── CLAUDE.md
+├── CLAUDE.md ( aka le gars pas drole )
 ├── apps
 │   ├── donation-platform
 │   │   └── README.md
