@@ -11,7 +11,7 @@ services:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - donnees_mariadb:/var/lib/mysql
-      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ../db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -33,7 +33,7 @@ services:
     networks: [interne]
 
   auth-service:
-    build: ../services/auth-service
+    build: ../../services/auth-service
     restart: unless-stopped
     environment:
       PORT: 3001
@@ -51,7 +51,7 @@ services:
     networks: [interne]
 
   payment-api:
-    build: ../services/payment-api
+    build: ../../services/payment-api
     restart: unless-stopped
     environment:
       PORT: 3002
@@ -63,7 +63,7 @@ services:
       DB_NAME: ${DB_NAME}
       PSP_URL: http://psp-simulator:3003
       PSP_WEBHOOK_SECRET: ${PSP_WEBHOOK_SECRET}
-      PSP_RETURN_URL: ${PUBLIC_FRONT_URL}/don/retour
+      PSP_RETURN_URL: ${PUBLIC_FRONT_URL}
     ports:
       - "3002:3002"
     depends_on:
@@ -74,7 +74,7 @@ services:
     networks: [interne]
 
   psp-simulator:
-    build: ../services/psp-simulator
+    build: ../../services/psp-simulator
     restart: unless-stopped
     environment:
       PORT: 3003
