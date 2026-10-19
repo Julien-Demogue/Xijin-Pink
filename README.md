@@ -40,7 +40,8 @@ during and after.
 │   ├── anomaly-detection/        # ML over Prometheus metrics + Loki logs
 │   └── rag-assistant/            # Ollama + LangChain, read-only over docs/
 ├── infra/
-│   ├── docker-compose.yml        # (to be added) full stack orchestration
+│   ├── docker-compose.yml        # MariaDB, phpMyAdmin + the three services
+│   ├── db/init/                  # SQL schema (utilisateurs, transactions, titres)
 │   ├── ansible/                  # Deployment + remediation playbooks
 │   ├── observability/            # Prometheus, Grafana, Loki, alert rules (SOC)
 │   └── secrets/                  # SOPS-encrypted files or Vault policies
@@ -68,8 +69,11 @@ during and after.
 
 ## Status
 
-Kick-off (Monday): architecture, interfaces and EBIOS risk matrix. No service
-code yet — the folders above are placeholders describing intended components.
+Backend implemented: `auth-service`, `payment-api`, `psp-simulator` (Node.js),
+MariaDB schema and a Docker Compose dev stack with phpMyAdmin — run it from
+[infra/](infra/README.md). Covers accounts/profile, donations, transaction
+history, leaderboard and donor titles. Still to build: frontend, dashboard,
+observability, WAF, AI detection/RAG, red-team and governance docs.
 
 ## Deliverables
 
