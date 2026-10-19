@@ -63,7 +63,7 @@ services:
       DB_NAME: ${DB_NAME}
       PSP_URL: http://psp-simulator:3003
       PSP_WEBHOOK_SECRET: ${PSP_WEBHOOK_SECRET}
-      PSP_RETURN_URL: ${PUBLIC_FRONT_URL}
+      PSP_RETURN_URL: ${PUBLIC_FRONT_URL}/don/retour
     ports:
       - "3002:3002"
     depends_on:
