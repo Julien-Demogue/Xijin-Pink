@@ -8,7 +8,7 @@ design stays realistic.
 
 ## Nominal flow
 
-1. Donor submits email + amount on the donation page (`services/frontend`).
+1. Donor submits email + amount on the donation page (`frontend`).
 2. Frontend calls `POST /api/donations/checkout` on `services/payment-api`
    (through the WAF).
 3. `payment-api` validates the payload, records the donation as `pending`, and

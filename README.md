@@ -30,11 +30,11 @@ during and after.
 ├── README.md
 ├── services/                     # Node.js microservices (Docker)
 │   ├── waf/                      # Reverse proxy + WAF, rate limiting, sole ingress
-│   ├── frontend/                 # Donation page (served behind the WAF)
 │   ├── auth-service/             # Authentication
 │   ├── payment-api/              # Business API: donations, transactions
 │   ├── psp-simulator/            # Simulated payment provider (replaces Stripe)
 │   └── remediation-engine/       # Alert → playbook → test transaction (scoped Docker access)
+├── frontend/                     # Donation page (React+Tailwind, served behind the WAF)
 ├── dashboard/                    # React + Tailwind supervision UI (before/during/after)
 ├── ai/
 │   ├── anomaly-detection/        # ML over Prometheus metrics + Loki logs
