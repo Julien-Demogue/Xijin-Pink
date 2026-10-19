@@ -22,7 +22,7 @@ reaches `paid`, not a container restart.
 | `auth-service`       | Authentication / sessions                          | Node.js       |
 | `payment-api`        | Donations + transactions (business logic)          | Node.js       |
 | `psp-simulator`      | Simulated payment provider (checkout + webhook)    | Node.js       |
-| `database`           | Persistent donor/transaction store                 | Postgres      |
+| `database`           | Persistent donor/transaction store                 | MariaDB       |
 | `remediation-engine` | Receives alerts, runs playbooks, verifies recovery | Node.js       |
 | `dashboard`          | Supervision: components, events, alerts, recovery  | React+Tailwind|
 
@@ -117,7 +117,10 @@ points:
 
 ## 7. Open decisions
 
-- Database engine and schema for donations/transactions.
+- Database engine and schema: **decided** — MariaDB, with phpMyAdmin for dev
+  inspection; tables `utilisateurs`, `transactions`, `titres` (see
+  `infra/db/init/`). Shared by `auth-service` and `payment-api` (pragmatic for
+  the workshop; a per-service split is the stricter microservice form).
 - ML approach (features from metrics vs. logs) and labeling of normal vs. suspect.
 - Remediation trigger contract (alert payload schema shared by ML → engine).
 - WAF implementation (Nginx + ModSecurity/OWASP CRS, or a Node gateway).
