@@ -85,6 +85,19 @@ services:
     ports:
       - "3003:3003"
     networks: [interne]
+  
+  frontend:
+    build: ../../frontend
+    restart: unless-stopped
+    environment:
+      REACT_APP_AUTH_SERVICE_URL: http://auth-service:3001
+      REACT_APP_PAYMENT_API_URL: http://payment-api:3002
+      REACT_APP_PSP_URL: http://psp-simulator:3003
+    ports:
+      - "5173:5173"
+    networks: [interne]
+    command: >
+      /bin/sh -c "npm run dev -- --host 0.0.0.0"
 
 volumes:
   donnees_mariadb:
