@@ -16,7 +16,7 @@ application.use(
 );
 
 application.use(helmet());
-application.use(cors());
+application.use(cors({ origin: "*" }));
 application.use(express.json({ limit: "16kb" }));
 
 application.get("/health", (request, response) => response.json({ status: "ok" }));

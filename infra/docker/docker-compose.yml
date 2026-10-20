@@ -37,6 +37,7 @@ services:
     restart: unless-stopped
     environment:
       PORT: 3001
+      PUBLIC_FRONT_URL: ${PUBLIC_FRONT_URL}
       JWT_SECRET: ${JWT_SECRET}
       DB_HOST: mariadb
       DB_PORT: 3306
@@ -55,6 +56,7 @@ services:
     restart: unless-stopped
     environment:
       PORT: 3002
+      PUBLIC_FRONT_URL: ${PUBLIC_FRONT_URL}
       JWT_SECRET: ${JWT_SECRET}
       DB_HOST: mariadb
       DB_PORT: 3306

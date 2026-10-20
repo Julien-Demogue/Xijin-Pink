@@ -17,7 +17,7 @@ application.use(
 );
 
 application.use(helmet());
-application.use(cors());
+application.use(cors({ origin:"*" }));
 
 application.post(
   "/api/donations/webhook",

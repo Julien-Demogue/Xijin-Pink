@@ -14,6 +14,7 @@ function read(name, defaultValue) {
 export const config = {
   serviceName: "auth-service",
   port: Number(read("PORT", "3001")),
+  frontendUrl: read("PUBLIC_FRONT_URL", "http://localhost:5173"),
   token: {
     secret: read("JWT_SECRET"),
     expiresIn: read("JWT_EXPIRES_IN", "2h"),

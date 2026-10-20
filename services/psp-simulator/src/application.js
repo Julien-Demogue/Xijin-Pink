@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
@@ -57,6 +58,7 @@ function checkoutPage(session) {
 
 export const application = express();
 application.use(helmet({ contentSecurityPolicy: false }));
+application.use(cors({ origin: "*" }));
 application.use(express.json({ limit: "16kb" }));
 
 application.get("/health", (request, response) => response.json({ status: "ok" }));
