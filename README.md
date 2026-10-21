@@ -14,7 +14,7 @@ human repair step. See [CLAUDE.md](CLAUDE.md) for the full brief and
 
 ```text
 fictional transaction  →  incident (from Attacker PC)  →  observability (metrics/logs)
-      →  ML anomaly detection  →  remediation decision  →  Ansible playbook
+      →  ML anomaly detection  →  remediation decision
       →  service verified usable (a new transaction succeeds)
 ```
 
@@ -40,9 +40,8 @@ during and after.
 │   ├── anomaly-detection/        # ML over Prometheus metrics + Loki logs
 │   └── rag-assistant/            # Ollama + LangChain, read-only over docs/
 ├── infra/
-│   ├── docker/        # MariaDB, phpMyAdmin + the three services
+│   ├── docker/                   # MariaDB, phpMyAdmin + the others services
 │   ├── db/init/                  # SQL schema (utilisateurs, transactions, titres)
-│   ├── ansible/                  # Deployment + remediation playbooks
 │   ├── observability/            # Prometheus, Grafana, Loki, alert rules (SOC)
 │   └── secrets/                  # SOPS-encrypted files or Vault policies
 ├── redteam/                      # Attack scripts run from the Attacker PC
