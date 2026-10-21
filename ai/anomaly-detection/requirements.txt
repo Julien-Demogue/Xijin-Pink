@@ -1,0 +1,8 @@
+# ML anomaly detector — kept light for the 8 GB laptop budget (CPU only).
+numpy>=2.0
+pandas>=2.0
+scikit-learn==1.8.0   # pinned: must match the version that pickled model_store/*.pkl
+# live scorer: serves /metrics and POSTs alerts
+fastapi>=0.110
+uvicorn>=0.27
+prometheus-client>=0.20

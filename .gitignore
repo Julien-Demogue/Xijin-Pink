@@ -4,3 +4,15 @@ node_modules/
 npm-debug.log*
 dist/
 coverage/
+
+# Generated datasets (regenerable from a campaign run)
+data/
+
+# Trained model artifacts (regenerate via detector.train_eval)
+ai/anomaly-detection/model_store/
+ai/rag-assistant/index.pkl
+
+# Python caches
+__pycache__/
+*.pyc
+.venv/

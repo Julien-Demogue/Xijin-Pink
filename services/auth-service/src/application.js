@@ -2,11 +2,15 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
+import { config } from "./config.js";
+import { createTelemetry } from "./middleware/telemetry.js";
 import { authRouter } from "./routes/auth.js";
 import { openApiSpec } from "./openapi.js";
 import { log } from "./utils.js";
 
 export const application = express();
+
+const telemetry = createTelemetry({ serviceName: config.serviceName, log });
 
 application.use(
   "/api-docs",
@@ -17,6 +21,8 @@ application.use(
 
 application.use(helmet());
 application.use(cors({ origin: "*" }));
+application.use(telemetry.middleware);
+application.get("/metrics", telemetry.metricsHandler);
 application.use(express.json({ limit: "16kb" }));
 
 application.get("/health", (request, response) => response.json({ status: "ok" }));

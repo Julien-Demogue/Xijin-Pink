@@ -1,0 +1,23 @@
+# Prometheus — scrapes the services' /metrics (prom-client, incl. process CPU &
+# memory). Internal only; the dashboard reads it via Grafana. Per-service `service`
+# label so the detector can join cpu/mem onto its per-service windows.
+global:
+  scrape_interval: 5s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: xijin-services
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["auth-service:3001"]
+        labels: { service: auth-service }
+      - targets: ["payment-api:3002"]
+        labels: { service: payment-api }
+      - targets: ["psp-simulator:3003"]
+        labels: { service: psp-simulator }
+      - targets: ["anomaly-detector:3010"]
+        labels: { service: anomaly-detector }
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
