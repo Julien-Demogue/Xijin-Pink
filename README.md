@@ -10,6 +10,23 @@ human repair step. See [CLAUDE.md](CLAUDE.md) for the full brief and
 > machines and the `RESILIENCE-G<n>` hotspot (`192.168.137.0/24`). Campus
 > networks, other teams, and the Internet are out of scope.
 
+## Quick start (one command)
+
+Requires Docker (daemon running); Ollama is optional (for the RAG assistant).
+
+```bash
+./scripts/start.sh            # Linux / macOS / Git-Bash
+```
+```powershell
+.\scripts\start.ps1           # Windows PowerShell
+```
+
+It generates secrets, builds every image and launches the whole platform. Then:
+WAF ingress `:8080`, supervision dashboard `:3000/d/xijin-resilience`, SOC/SIEM
+`:3000/d/xijin-soc`, face-auth back-office `:3005`. Check with
+`./scripts/verify.sh`, stop with `./scripts/stop.sh`. See
+[scripts/README.md](scripts/README.md).
+
 ## The resilience chain
 
 ```text

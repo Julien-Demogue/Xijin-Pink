@@ -101,6 +101,20 @@ services:
     command: >
       /bin/sh -c "npm run dev -- --host 0.0.0.0"
 
+  # --- Cybersecurity: WAF (sole ingress, rate limiting, filtering) ---
+  waf:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ../../services/waf/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:8080"      # hotspot-facing ingress (frontend + APIs via the WAF)
+    depends_on:
+      - frontend
+      - auth-service
+      - payment-api
+    networks: [interne]
+
   # --- Observability: metrics (Prometheus) + logs (Loki + Promtail) + Grafana ---
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -192,11 +206,27 @@ services:
     profiles: ["ai"]
     networks: [interne]
 
+  face-auth:
+    build: ../../services/face-auth
+    restart: unless-stopped
+    environment:
+      AUTH_URL: http://auth-service:3001
+      # ESP8266_URL: http://192.168.137.50   # the ESP's IP; unset = mock LED
+    volumes:
+      - face_data:/app/data        # biometric templates (persisted)
+    ports:
+      - "3005:3005"
+    depends_on:
+      - auth-service
+    profiles: ["ai"]
+    networks: [interne]
+
 volumes:
   donnees_mariadb:
   loki_data:
   grafana_data:
   prometheus_data:
+  face_data:
 
 networks:
   interne:

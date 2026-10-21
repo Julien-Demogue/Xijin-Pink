@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Back-office — Authentification renforcée</title>
+  <style>
+    :root { --bg:#0f1420; --card:#1a2131; --fg:#e8edf6; --muted:#8b97ab; --accent:#e6397f; --green:#2ecc71; --red:#e74c3c; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, sans-serif; background:var(--bg); color:var(--fg);
+           display:flex; align-items:center; justify-content:center; min-height:100vh; padding:16px; }
+    .card { background:var(--card); border-radius:16px; padding:28px; width:100%; max-width:440px;
+            box-shadow:0 10px 40px rgba(0,0,0,.4); }
+    h1 { font-size:20px; margin:0 0 4px; }
+    .sub { color:var(--muted); font-size:13px; margin-bottom:20px; }
+    label { font-size:13px; color:var(--muted); display:block; margin:14px 0 6px; }
+    input { width:100%; padding:11px 12px; border-radius:9px; border:1px solid #2b3550;
+            background:#0e1422; color:var(--fg); font-size:15px; }
+    input:disabled { opacity:.5; }
+    button { width:100%; margin-top:16px; padding:12px; border:0; border-radius:9px; cursor:pointer;
+             background:var(--accent); color:#fff; font-size:15px; font-weight:600; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    video, canvas { width:100%; border-radius:12px; background:#000; margin-top:14px; display:none; }
+    .row { display:flex; align-items:center; gap:12px; margin-top:16px; }
+    .led { width:20px; height:20px; border-radius:50%; background:#30384a; flex:none;
+           border:2px solid #2b3550; }
+    .led.green { background:var(--green); box-shadow:0 0 12px var(--green); }
+    .led.red   { background:var(--red);   box-shadow:0 0 12px var(--red); }
+    .led.blink { animation: blink .5s steps(1) infinite; }
+    @keyframes blink { 50% { opacity:.15; } }
+    .status { font-size:13px; margin-top:12px; min-height:18px; }
+    .ok { color:var(--green); } .err { color:var(--red); } .muted { color:var(--muted); }
+    .steps { display:flex; gap:6px; margin-bottom:18px; }
+    .step { flex:1; height:4px; border-radius:2px; background:#2b3550; }
+    .step.active { background:var(--accent); }
+    details { margin-top:22px; border-top:1px solid #2b3550; padding-top:14px; }
+    summary { cursor:pointer; color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Back-office sécurisé</h1>
+    <div class="sub">Identifiant → reconnaissance faciale → mot de passe</div>
+    <div class="steps"><div class="step active" id="s1"></div><div class="step" id="s2"></div></div>
+
+    <div class="row"><div class="led" id="led"></div>
+      <span class="muted" id="ledlabel">LED : éteinte</span></div>
+
+    <!-- Step 1: identifier + face -->
+    <div id="stage1">
+      <label>Identifiant (email)</label>
+      <input id="identifier" type="email" placeholder="operator@xijin-pink.test" autocomplete="username">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas" style="display:none"></canvas>
+      <button id="verifyBtn">Vérifier mon visage</button>
+    </div>
+
+    <!-- Step 2: password -->
+    <div id="stage2" style="display:none">
+      <label>Mot de passe</label>
+      <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+      <button id="loginBtn">Se connecter</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <details>
+      <summary>Enrôlement (admin) — enregistrer un visage</summary>
+      <label>Identifiant à enrôler</label>
+      <input id="enrollId" type="email" placeholder="operator@xijin-pink.test">
+      <label>Rôle</label>
+      <input id="enrollRole" type="text" placeholder="operator" value="operator">
+      <button id="enrollBtn">Capturer & enrôler</button>
+    </details>
+  </div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const led = $("led"), ledlabel = $("ledlabel"), status = $("status");
+let stream = null;
+
+function setLed(state) {
+  led.className = "led";
+  const map = {
+    OFF:        ["",                "éteinte"],
+    GREEN_BLINK:["green blink",     "vert clignotant — en attente du mot de passe"],
+    GREEN_30S:  ["green",           "vert fixe — accès autorisé"],
+    RED_BLINK_10:["red blink",      "rouge clignotant — mot de passe refusé"],
+    RED_30S:    ["red",             "rouge fixe — non reconnu"],
+  };
+  const [cls, text] = map[state] || ["", "éteinte"];
+  if (cls) led.className = "led " + cls;
+  ledlabel.textContent = "LED : " + text;
+}
+function say(msg, cls="muted") { status.className = "status " + cls; status.textContent = msg; }
+
+async function startCamera() {
+  stream = await navigator.mediaDevices.getUserMedia({ video: { width: 480, height: 360 } });
+  $("video").srcObject = stream; $("video").style.display = "block";
+  await new Promise(r => setTimeout(r, 700)); // let exposure settle
+}
+function stopCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = null; $("video").style.display = "none";
+}
+function grabFrame() {
+  const v = $("video"), c = $("canvas");
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext("2d").drawImage(v, 0, 0);
+  return c.toDataURL("image/jpeg", 0.9);
+}
+
+async function api(path, body) {
+  const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify(body) });
+  return { ok: r.ok, status: r.status, data: await r.json().catch(() => ({})) };
+}
+
+$("verifyBtn").onclick = async () => {
+  const identifier = $("identifier").value.trim();
+  if (!identifier) return say("Saisis ton identifiant.", "err");
+  $("verifyBtn").disabled = true;
+  try {
+    say("Activation de la caméra…");
+    await startCamera();
+    say("Analyse du visage…");
+    const { data } = await api("/identify", { identifier, image: grabFrame() });
+    stopCamera();
+    if (data.recognized) {
+      setLed("GREEN_BLINK");
+      $("stage1").style.display = "none"; $("stage2").style.display = "block";
+      $("s2").classList.add("active");
+      say(`Reconnu (score ${data.score}). Saisis ton mot de passe.`, "ok");
+      $("password").focus();
+    } else if (data.locked) {
+      setLed("OFF");
+      say(`Bloqué ${data.lockedForSeconds}s après trop d'échecs.`, "err");
+    } else if (data.reason === "no_face") {
+      setLed("OFF");
+      say("Aucun visage détecté, réessaie bien en face.", "err");
+    } else {
+      setLed("RED_30S");
+      $("identifier").value = "";
+      say(`Non reconnu. Essais restants : ${data.attemptsLeft}.`, "err");
+      setTimeout(() => setLed("OFF"), 3000);
+    }
+  } catch (e) {
+    stopCamera(); say("Caméra indisponible : " + e.message, "err");
+  } finally { $("verifyBtn").disabled = false; }
+};
+
+$("loginBtn").onclick = async () => {
+  const identifier = $("identifier").value.trim();
+  const pw = $("password").value;
+  $("loginBtn").disabled = true;
+  const { data } = await api("/password", { identifier, password: pw });
+  if (data.ok) {
+    setLed("GREEN_30S"); say("Accès autorisé ✓ Back-office débloqué.", "ok");
+  } else if (data.error === "face_required") {
+    say("Reconnaissance faciale requise d'abord.", "err");
+  } else {
+    setLed("RED_BLINK_10"); say("Mot de passe refusé — on recommence l'identification.", "err");
+    setTimeout(() => {
+      setLed("OFF"); $("stage2").style.display = "none"; $("stage1").style.display = "block";
+      $("s2").classList.remove("active"); $("password").value = ""; $("identifier").value = "";
+    }, 2500);
+  }
+  $("loginBtn").disabled = false;
+};
+
+$("enrollBtn").onclick = async () => {
+  const identifier = $("enrollId").value.trim();
+  if (!identifier) return say("Identifiant à enrôler requis.", "err");
+  $("enrollBtn").disabled = true;
+  try {
+    await startCamera(); const img = grabFrame(); stopCamera();
+    const { data, status: st } = await api("/enroll",
+      { identifier, image: img, role: $("enrollRole").value.trim() || "operator" });
+    if (st === 200) say(`Enrôlé ${identifier} (${data.samples} échantillon(s)).`, "ok");
+    else say("Enrôlement échoué : " + (data.message || data.error), "err");
+  } catch (e) { stopCamera(); say("Caméra indisponible : " + e.message, "err"); }
+  finally { $("enrollBtn").disabled = false; }
+};
+</script>
+</body>
+</html>

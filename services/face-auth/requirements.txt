@@ -1,0 +1,8 @@
+# Face-auth back-office — lightweight face recognition (CPU, no dlib/compiler).
+opencv-python-headless>=4.9   # YuNet + SFace via cv2.FaceDetectorYN / FaceRecognizerSF
+numpy>=1.26
+fastapi>=0.110
+uvicorn>=0.27
+pydantic>=2
+# Models (downloaded into models/, git-ignored):
+#   face_detection_yunet_2023mar.onnx, face_recognition_sface_2021dec.onnx (OpenCV Zoo)

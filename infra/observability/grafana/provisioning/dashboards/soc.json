@@ -1,0 +1,62 @@
+{
+  "uid": "xijin-soc",
+  "title": "Xijin-Pink — SOC / SIEM",
+  "tags": ["xijin-pink", "soc", "security"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-30m", "to": "now" },
+  "templating": { "list": [] },
+  "annotations": { "list": [] },
+  "panels": [
+    { "type": "row", "title": "WAF (ingress)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 } },
+    {
+      "type": "timeseries", "title": "WAF — requêtes bloquées (403/405) & limitées (429) /min",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 1 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "bars", "fillOpacity": 60 } }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "loki", "uid": "loki" }, "expr": "sum(count_over_time({service=\"waf\"} | json | status=~\"403|405\" [1m]))", "legendFormat": "bloquées (403/405)" },
+        { "refId": "B", "datasource": { "type": "loki", "uid": "loki" }, "expr": "sum(count_over_time({service=\"waf\"} | json | status=`429` [1m]))", "legendFormat": "limitées (429)" }
+      ]
+    },
+    {
+      "type": "stat", "title": "Services en alerte (détecteur)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "background", "graphMode": "none", "textMode": "value" },
+      "fieldConfig": { "defaults": { "thresholds": { "mode": "absolute", "steps": [
+        { "color": "green", "value": null }, { "color": "red", "value": 1 } ] },
+        "color": { "mode": "thresholds" } }, "overrides": [] },
+      "targets": [ { "refId": "A", "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "count(anomaly_state == 2) or vector(0)", "instant": true } ]
+    },
+    { "type": "row", "title": "Authentification & paiement", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 } },
+    {
+      "type": "timeseries", "title": "Échecs de connexion (login_failed) /min",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "fillOpacity": 20 }, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "targets": [ { "refId": "A", "datasource": { "type": "loki", "uid": "loki" }, "expr": "sum(count_over_time({service=\"auth-service\"} | json | message=`login_failed` [1m]))", "legendFormat": "login_failed" } ]
+    },
+    {
+      "type": "timeseries", "title": "Signatures webhook invalides /min",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "fieldConfig": { "defaults": { "custom": { "drawStyle": "bars", "fillOpacity": 60 }, "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "targets": [ { "refId": "A", "datasource": { "type": "loki", "uid": "loki" }, "expr": "sum(count_over_time({service=\"payment-api\"} | json | message=`webhook_invalid_signature` [1m]))", "legendFormat": "webhook_invalid_signature" } ]
+    },
+    { "type": "row", "title": "Journal de sécurité corrélé (SIEM)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 } },
+    {
+      "type": "logs", "title": "Événements de sécurité (WAF blocks · auth · alertes ML)",
+      "datasource": { "type": "loki", "uid": "loki" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 19 },
+      "options": { "showTime": true, "wrapLogMessage": true, "sortOrder": "Descending" },
+      "targets": [
+        { "refId": "A", "datasource": { "type": "loki", "uid": "loki" }, "expr": "{service=~\"auth-service|payment-api|anomaly-detector\"} | json | message=~`login_failed|webhook_invalid_signature|anomaly_alert`" },
+        { "refId": "B", "datasource": { "type": "loki", "uid": "loki" }, "expr": "{service=\"waf\"} | json | status=~`403|405|429`" }
+      ]
+    }
+  ]
+}

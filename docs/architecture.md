@@ -124,3 +124,21 @@ points:
 - ML approach (features from metrics vs. logs) and labeling of normal vs. suspect.
 - Remediation trigger contract (alert payload schema shared by ML → engine).
 - WAF implementation (Nginx + ModSecurity/OWASP CRS, or a Node gateway).
+
+## 8. Consigne Additionnelle 1 — authentification renforcée du back-office
+
+Back-office protégé par une auth à 3 étapes : **identifiant → reconnaissance
+faciale → mot de passe**, avec un **ESP8266 à LED bicolore** reflétant l'état.
+
+| Composant | Rôle | Stack |
+| --------- | ---- | ----- |
+| `services/face-auth` | IA légère reconnaissance faciale + flux d'auth + habilitations ; sert le back-office | Python, OpenCV (YuNet+SFace) |
+| `iot/esp8266-led` | Objet connecté : LED rouge/vert selon l'état, en WiFi sur le hotspot | ESP8266, Arduino/PlatformIO |
+
+- La reconnaissance (1:1) confirme que le visage correspond à l'identifiant saisi
+  (seuil cosinus 0,363). Échec → identifiant vidé, 1 réessai puis blocage 5 min
+  (escalade). Le mot de passe reste délégué à `auth-service`.
+- Le service et les gabarits biométriques sont **internes à l'hôte** ; l'ESP8266
+  est sur le hotspot. Cadrage RGPD/EBIOS : [governance/biometrie-rgpd.md](governance/biometrie-rgpd.md).
+- Écarts assumés (temporaires) : caméra navigateur (pas pilote caméra hôte), IDE
+  libre (pas CLion imposé), pas de détection de vivacité.
