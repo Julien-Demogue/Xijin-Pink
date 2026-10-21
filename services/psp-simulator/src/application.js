@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
@@ -59,6 +60,7 @@ function checkoutPage(session) {
 export const application = express();
 const telemetry = createTelemetry({ serviceName: config.serviceName, log });
 application.use(helmet({ contentSecurityPolicy: false }));
+application.use(cors({ origin: "*" }));
 application.use(express.json({ limit: "16kb" }));
 application.use(telemetry.middleware);
 application.get("/metrics", telemetry.metricsHandler);

@@ -14,7 +14,7 @@ human repair step. See [CLAUDE.md](CLAUDE.md) for the full brief and
 
 ```text
 fictional transaction  →  incident (from Attacker PC)  →  observability (metrics/logs)
-      →  ML anomaly detection  →  remediation decision  →  Ansible playbook
+      →  ML anomaly detection  →  remediation decision
       →  service verified usable (a new transaction succeeds)
 ```
 
@@ -40,9 +40,8 @@ during and after.
 │   ├── anomaly-detection/        # ML over Prometheus metrics + Loki logs
 │   └── rag-assistant/            # Ollama + LangChain, read-only over docs/
 ├── infra/
-│   ├── docker-compose.yml        # MariaDB, phpMyAdmin + the three services
+│   ├── docker/                   # MariaDB, phpMyAdmin + the others services
 │   ├── db/init/                  # SQL schema (utilisateurs, transactions, titres)
-│   ├── ansible/                  # Deployment + remediation playbooks
 │   ├── observability/            # Prometheus, Grafana, Loki, alert rules (SOC)
 │   └── secrets/                  # SOPS-encrypted files or Vault policies
 ├── redteam/                      # Attack scripts run from the Attacker PC
@@ -62,7 +61,6 @@ during and after.
 | Services      | Node.js (REST or gRPC)                              |
 | Dashboard     | React + Tailwind CSS                                |
 | Orchestration | Docker Compose                                      |
-| Automation    | Ansible                                             |
 | Observability | Prometheus, Grafana, Loki (not Elastic)             |
 | Security      | WAF, SIEM/SOC, Vault or SOPS                        |
 | AI            | ML anomaly detection; Ollama + LangChain RAG (≤ 8B) |
@@ -78,6 +76,6 @@ observability, WAF, AI detection/RAG, red-team and governance docs.
 
 ## Deliverables
 
-`Workshop2026-M2-G<n>-{Dossier.pdf, Pres.pptx, VidChrono.mp4, Code.zip}`. The
+`Workshop2026-M2-G2-{Dossier.pdf, Pres.pptx, VidChrono.mp4, Code.zip}`. The
 archive must contain no plaintext secrets and a deploy/verify README. See
 [CLAUDE.md](CLAUDE.md#deliverables).

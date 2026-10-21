@@ -14,6 +14,7 @@ function read(name, defaultValue) {
 export const config = {
   serviceName: "payment-api",
   port: Number(read("PORT", "3002")),
+  frontendUrl: read("PUBLIC_FRONT_URL", "http://localhost:5173"),
   token: {
     secret: read("JWT_SECRET"),
   },

@@ -21,7 +21,7 @@ application.use(
 );
 
 application.use(helmet());
-application.use(cors());
+application.use(cors({ origin:"*" }));
 
 // Telemetry first, so every request (incl. the raw-body webhook) is logged/timed.
 application.use(telemetry.middleware);

@@ -20,7 +20,7 @@ application.use(
 );
 
 application.use(helmet());
-application.use(cors());
+application.use(cors({ origin: "*" }));
 application.use(telemetry.middleware);
 application.get("/metrics", telemetry.metricsHandler);
 application.use(express.json({ limit: "16kb" }));

@@ -7,9 +7,9 @@ runnable dev stack: database, phpMyAdmin, and the three Node.js services.
 ## Launch (dev)
 
 ```bash
-cd infra
+cd infra/docker
 cp .env.example .env     # adjust local values
-docker compose up --build
+docker compose up -d
 ```
 
 The stack declares `name: xijin-pink` so it stays an isolated Compose project
@@ -21,6 +21,7 @@ Services:
 | Service        | URL (dev)               | Role                                 |
 | -------------- | ----------------------- | ------------------------------------ |
 | phpMyAdmin     | http://localhost:8081   | Inspect the `xijin_pink` database    |
+| frontend       | http://localhost:5173   | Frontend                             |
 | auth-service   | http://localhost:3001   | Accounts, login, profile             |
 | payment-api    | http://localhost:3002   | Donations, history, leaderboard      |
 | psp-simulator  | http://localhost:3003   | Simulated payment provider           |
