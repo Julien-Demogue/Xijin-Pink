@@ -16,3 +16,8 @@ ai/rag-assistant/index.pkl
 __pycache__/
 *.pyc
 .venv/
+
+# Face-auth: ONNX models (large, re-downloadable) + biometric data
+services/face-auth/models/
+services/face-auth/data/
+*.onnx
