@@ -3,6 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 import { config } from "./config.js";
+import { createTelemetry } from "./middleware/telemetry.js";
 import { computeSignature } from "./signature.js";
 import { openApiSpec } from "./openapi.js";
 import { escapeHtml, log } from "./utils.js";
@@ -56,8 +57,11 @@ function checkoutPage(session) {
 }
 
 export const application = express();
+const telemetry = createTelemetry({ serviceName: config.serviceName, log });
 application.use(helmet({ contentSecurityPolicy: false }));
 application.use(express.json({ limit: "16kb" }));
+application.use(telemetry.middleware);
+application.get("/metrics", telemetry.metricsHandler);
 
 application.get("/health", (request, response) => response.json({ status: "ok" }));
 application.get("/openapi.json", (request, response) => response.json(openApiSpec));
@@ -71,6 +75,7 @@ application.use(
 application.post("/sessions", (request, response) => {
   const { reference, amountCents, currency, returnUrl } = request.body ?? {};
   if (typeof reference !== "string" || !Number.isInteger(amountCents)) {
+    request.log("warn", "validation_rejected", { action: "create_session" });
     return response.status(400).json({ error: "Invalid session parameters" });
   }
   const id = `sess_${crypto.randomUUID()}`;
@@ -82,7 +87,7 @@ application.post("/sessions", (request, response) => {
     returnUrl: returnUrl ?? config.defaultReturnUrl,
     status: "pending",
   });
-  log("info", "session_created", { id, reference });
+  request.log("info", "session_created", { id, reference });
   return response.status(201).json({
     sessionId: id,
     checkoutUrl: `${config.publicUrl}/checkout/${id}`,
@@ -92,6 +97,7 @@ application.post("/sessions", (request, response) => {
 application.get("/checkout/:id", (request, response) => {
   const session = sessions.get(request.params.id);
   if (!session) {
+    request.log("warn", "session_not_found", { action: "checkout_page" });
     return response.status(404).send("Payment session not found");
   }
   return response.type("html").send(checkoutPage(session));
@@ -100,11 +106,12 @@ application.get("/checkout/:id", (request, response) => {
 application.post("/checkout/:id/confirm", async (request, response) => {
   const session = sessions.get(request.params.id);
   if (!session) {
+    request.log("warn", "session_not_found", { action: "confirm" });
     return response.status(404).json({ error: "Session not found" });
   }
   const status = request.body?.decision === "fail" ? "failed" : "paid";
   session.status = status;
   await notifyPaymentApi(session, status);
-  log("info", "payment_confirmed", { id: session.id, status });
+  request.log("info", "payment_confirmed", { id: session.id, status });
   return response.json({ status, returnUrl: session.returnUrl });
 });

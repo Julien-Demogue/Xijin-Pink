@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "../config.js";
 import { pool } from "../db.js";
-import { isNonEmptyString, isValidEmail, log } from "../utils.js";
+import { isNonEmptyString, isValidEmail } from "../utils.js";
 
 const SALT_ROUNDS = 10;
 const MIN_PASSWORD_LENGTH = 8;
@@ -16,14 +16,17 @@ function signToken(id, email) {
 export async function register(request, response) {
   const { email, password, displayName } = request.body ?? {};
   if (!isValidEmail(email)) {
+    request.log("warn", "validation_rejected", { action: "register", field: "email" });
     return response.status(400).json({ error: "Invalid email" });
   }
   if (typeof password !== "string" || password.length < MIN_PASSWORD_LENGTH) {
+    request.log("warn", "validation_rejected", { action: "register", field: "password" });
     return response
       .status(400)
       .json({ error: "Password too short (8 characters minimum)" });
   }
   if (!isNonEmptyString(displayName, 80)) {
+    request.log("warn", "validation_rejected", { action: "register", field: "displayName" });
     return response.status(400).json({ error: "Display name is required" });
   }
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -32,7 +35,7 @@ export async function register(request, response) {
       "INSERT INTO users (email, password_hash, display_name) VALUES (:email, :passwordHash, :displayName)",
       { email: email.toLowerCase(), passwordHash, displayName: displayName.trim() }
     );
-    log("info", "account_created", { userId: result.insertId });
+    request.log("info", "account_created", { userId: result.insertId });
     const token = signToken(result.insertId, email.toLowerCase());
     return response.status(201).json({
       token,
@@ -44,6 +47,7 @@ export async function register(request, response) {
     });
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
+      request.log("warn", "register_conflict", {});
       return response.status(409).json({ error: "An account already exists for this email" });
     }
     throw error;
@@ -53,6 +57,7 @@ export async function register(request, response) {
 export async function login(request, response) {
   const { email, password } = request.body ?? {};
   if (!isValidEmail(email) || typeof password !== "string" || password.length === 0) {
+    request.log("warn", "validation_rejected", { action: "login" });
     return response.status(400).json({ error: "Invalid credentials" });
   }
   const [rows] = await pool.execute(
@@ -61,9 +66,13 @@ export async function login(request, response) {
   );
   const account = rows[0];
   if (!account || !(await bcrypt.compare(password, account.password_hash))) {
+    // Security event: never log the submitted credentials. `account_exists`
+    // lets the SIEM tell credential-stuffing from password-guessing.
+    request.log("warn", "login_failed", { account_exists: Boolean(account) });
     return response.status(401).json({ error: "Incorrect email or password" });
   }
   const token = signToken(account.id, account.email);
+  request.log("info", "login_succeeded", { userId: account.id });
   return response.json({ token });
 }
 
@@ -98,11 +107,13 @@ export async function updateProfile(request, response) {
     values.bio = bio.trim();
   }
   if (fields.length === 0) {
+    request.log("warn", "validation_rejected", { action: "update_profile" });
     return response.status(400).json({ error: "No changes provided" });
   }
   await pool.execute(
     `UPDATE users SET ${fields.join(", ")} WHERE id = :id`,
     values
   );
+  request.log("info", "profile_updated", { userId: request.user.id, fields: fields.length });
   return getProfile(request, response);
 }

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { config } from "../config.js";
 import { pool } from "../db.js";
-import { isValidEmail, log } from "../utils.js";
+import { isValidEmail } from "../utils.js";
 import { computeSignature, isValidSignature } from "../signature.js";
 import { loadTitles, resolveNextTitle, resolveTitle } from "../titles.js";
 
@@ -34,15 +34,18 @@ export async function createCheckout(request, response) {
     amountCents < config.donation.minAmount ||
     amountCents > config.donation.maxAmount
   ) {
+    request.log("warn", "checkout_rejected", { reason: "invalid_amount" });
     return response.status(400).json({ error: "Invalid amount" });
   }
   const normalizedCurrency = typeof currency === "string" ? currency.toUpperCase() : "EUR";
   if (!config.donation.allowedCurrencies.includes(normalizedCurrency)) {
+    request.log("warn", "checkout_rejected", { reason: "unsupported_currency" });
     return response.status(400).json({ error: "Unsupported currency" });
   }
   const userId = request.user?.id ?? null;
   const donorEmail = userId ? request.user.email : email;
   if (!userId && !isValidEmail(donorEmail)) {
+    request.log("warn", "checkout_rejected", { reason: "missing_email" });
     return response.status(400).json({ error: "Email required for an anonymous donation" });
   }
   const reference = generateReference();
@@ -57,7 +60,7 @@ export async function createCheckout(request, response) {
     }
   );
   const session = await createPspSession(reference, amountCents, normalizedCurrency);
-  log("info", "checkout_created", { reference, amountCents, userId });
+  request.log("info", "checkout_created", { reference, amountCents, userId });
   return response.status(201).json({ reference, paymentUrl: session.checkoutUrl });
 }
 
@@ -66,7 +69,7 @@ export async function receiveWebhook(request, response) {
   const rawBody = Buffer.isBuffer(request.body) ? request.body : Buffer.from("");
   const expectedSignature = computeSignature(config.psp.webhookSecret, rawBody);
   if (!isValidSignature(receivedSignature, expectedSignature)) {
-    log("alert", "webhook_invalid_signature", {});
+    request.log("alert", "webhook_invalid_signature", {});
     return response.status(401).json({ error: "Invalid signature" });
   }
   const event = JSON.parse(rawBody.toString("utf8"));
@@ -79,7 +82,7 @@ export async function receiveWebhook(request, response) {
       reference: event.reference,
     }
   );
-  log("info", "webhook_received", { reference: event.reference, status });
+  request.log("info", "webhook_received", { reference: event.reference, status });
   return response.json({ received: true });
 }
 

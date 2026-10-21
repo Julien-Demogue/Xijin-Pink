@@ -86,8 +86,102 @@ services:
       - "3003:3003"
     networks: [interne]
 
+  # --- Observability: metrics (Prometheus) + logs (Loki + Promtail) + Grafana ---
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"   # dev-only, like the other local mappings
+    networks: [interne]
+
+  loki:
+    image: grafana/loki:3.1.1
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ../observability/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki_data:/loki
+    # Dev-only host mapping for the dataset exporter. Like the 3001-3003/8081
+    # mappings, this is for local work; on the hotspot Loki stays internal.
+    ports:
+      - "3100:3100"
+    networks: [interne]
+
+  promtail:
+    image: grafana/promtail:3.1.1
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ../observability/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - loki
+    networks: [interne]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    restart: unless-stopped
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_USERS_DEFAULT_THEME: light
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ../observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+    networks: [interne]
+
+  # --- AI (opt-in): start with `docker compose --profile ai up` ---
+  anomaly-detector:
+    build: ../../ai/anomaly-detection
+    restart: unless-stopped
+    environment:
+      LOKI_URL: http://loki:3100
+      PROM_URL: http://prometheus:9090
+      STEP_S: "5"
+      MODEL_DIR: /app/model_store
+      # REMEDIATION_URL: http://remediation-engine:9000/alerts   # when it exists
+    volumes:
+      # Model trained by `python -m detector.train_eval` (must exist first).
+      - ../../ai/anomaly-detection/model_store:/app/model_store:ro
+    ports:
+      - "3010:3010"
+    depends_on:
+      - loki
+    profiles: ["ai"]
+    networks: [interne]
+
+  rag-assistant:
+    build: ../../ai/rag-assistant
+    restart: unless-stopped
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434   # Ollama runs on the host
+      DETECTOR_URL: http://anomaly-detector:3010
+      RAG_CORPUS_DIR: /app/docs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../../docs:/app/docs:ro
+    ports:
+      - "3020:3020"
+    profiles: ["ai"]
+    networks: [interne]
+
 volumes:
   donnees_mariadb:
+  loki_data:
+  grafana_data:
+  prometheus_data:
 
 networks:
   interne:

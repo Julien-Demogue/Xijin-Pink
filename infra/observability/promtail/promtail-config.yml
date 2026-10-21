@@ -1,0 +1,51 @@
+# Promtail — discovers the stack's containers over the Docker API and ships
+# their JSON logs to Loki. docker_sd streams logs through the daemon socket, so
+# no host log-file mount is needed (portable to Docker Desktop / Windows).
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: xijin-pink-containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      # Only this compose project's containers.
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_project"]
+        regex: xijin-pink
+        action: keep
+      # Low-cardinality labels: compose service name + container name.
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_service"]
+        target_label: service
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: container
+    pipeline_stages:
+      # 1. Unwrap the Docker json-file envelope -> raw app log line.
+      - docker: {}
+      # 2. Parse our structured JSON log line.
+      - json:
+          expressions:
+            level: level
+            message: message
+            svc: service
+            request_id: request_id
+            ts: timestamp
+      # 3. Promote only low-cardinality fields to labels. Everything else
+      #    (message, request_id, route, status, ip, ...) stays queryable via
+      #    `| json` in LogQL without exploding the index.
+      - labels:
+          level:
+      # 4. Use the app timestamp (our `timestamp` field) when present.
+      - timestamp:
+          source: ts
+          format: RFC3339Nano
+          fallback_formats:
+            - RFC3339

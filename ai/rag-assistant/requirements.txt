@@ -1,0 +1,6 @@
+# RAG assistant — local only. Embeddings + LLM run on Ollama over HTTP, so no
+# heavy ML libs are needed at runtime (numpy for the flat cosine index).
+numpy>=1.26
+fastapi>=0.110
+uvicorn>=0.27
+# Ollama models (pull once): nomic-embed-text (embeddings), qwen3:4b (LLM, <=8B)

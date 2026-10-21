@@ -2,12 +2,16 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
+import { config } from "./config.js";
 import { receiveWebhook } from "./controllers/donations.js";
+import { createTelemetry } from "./middleware/telemetry.js";
 import { donationsRouter } from "./routes/donations.js";
 import { openApiSpec } from "./openapi.js";
 import { asyncHandler, log } from "./utils.js";
 
 export const application = express();
+
+const telemetry = createTelemetry({ serviceName: config.serviceName, log });
 
 application.use(
   "/api-docs",
@@ -18,6 +22,10 @@ application.use(
 
 application.use(helmet());
 application.use(cors());
+
+// Telemetry first, so every request (incl. the raw-body webhook) is logged/timed.
+application.use(telemetry.middleware);
+application.get("/metrics", telemetry.metricsHandler);
 
 application.post(
   "/api/donations/webhook",
