@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Workshop2026-M2-G2 Dossier d'ingénierie et de gouvernance</title>
+<style>
+  @page {
+    size: A4;
+    margin: 17mm 17mm 18mm 17mm;
+    @bottom-left {
+      content: "Workshop2026-M2-G2 · Xijin Pink · Dossier d'ingénierie et de gouvernance";
+      font: 7.5pt "Segoe UI", Arial, sans-serif;
+      color: #8a8f98;
+    }
+    @bottom-right {
+      content: counter(page) " / " counter(pages);
+      font: 7.5pt "Segoe UI", Arial, sans-serif;
+      color: #8a8f98;
+    }
+  }
+  @page :first {
+    @bottom-left { content: none; }
+    @bottom-right { content: none; }
+  }
+
+  :root {
+    --ink: #1d2125;
+    --muted: #5d636b;
+    --rule: #dfe1e5;
+    --accent: #a3164f;
+    --accent-soft: #fbeaf1;
+    --accent-line: #efc3d5;
+  }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: "Segoe UI", Calibri, Arial, sans-serif;
+    font-size: 9.4pt;
+    line-height: 1.4;
+  }
+
+  p { margin: 0 0 5.5pt; text-align: justify; hyphens: auto; }
+  ul, ol { margin: 0 0 6pt; padding-left: 16pt; }
+  li { margin-bottom: 2.5pt; text-align: justify; hyphens: auto; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.4pt; color: #3b3f45; }
+  sup { font-size: 70%; line-height: 0; }
+
+  h1 {
+    font-size: 14pt;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 12pt 0 5pt;
+    padding-bottom: 3pt;
+    border-bottom: 1.2pt solid var(--accent-line);
+    break-after: avoid;
+  }
+  h2 {
+    font-size: 10.8pt;
+    font-weight: 600;
+    margin: 9pt 0 3.5pt;
+    break-after: avoid;
+  }
+  h1 + h2 { margin-top: 4pt; }
+  .newpage { break-before: page; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.3pt;
+    line-height: 1.3;
+    margin: 3pt 0 7pt;
+  }
+  th {
+    text-align: left;
+    font-weight: 600;
+    background: var(--accent-soft);
+    border-bottom: 0.8pt solid var(--accent-line);
+    padding: 3pt 5pt;
+    vertical-align: bottom;
+  }
+  td {
+    padding: 2.6pt 5pt;
+    border-bottom: 0.5pt solid var(--rule);
+    vertical-align: top;
+  }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  td.c, th.c { text-align: center; white-space: nowrap; }
+  td.nw { white-space: nowrap; }
+  .small { font-size: 8pt; color: var(--muted); }
+
+  figure { margin: 4pt 0 9pt; break-inside: avoid; }
+  figcaption { font-size: 8pt; color: var(--muted); margin-top: 3pt; text-align: center; }
+  svg text { font-family: "Segoe UI", Arial, sans-serif; }
+
+  /* Detection pipeline (figure 2) */
+  .pipe { display: flex; align-items: stretch; gap: 0; margin-top: 2pt; }
+  .pipe div {
+    flex: 1;
+    border: 0.8pt solid #9aa0a8;
+    border-radius: 4pt;
+    padding: 4pt 5pt;
+    font-size: 7.8pt;
+    line-height: 1.3;
+    text-align: center;
+    background: #fff;
+  }
+  .pipe div b { display: block; font-size: 8.2pt; font-weight: 600; margin-bottom: 1pt; }
+  .pipe div.key { border-color: var(--accent); background: var(--accent-soft); }
+  .pipe span { align-self: center; padding: 0 3pt; color: #7a8089; font-size: 10pt; }
+
+  /* Cover */
+  .cover {
+    height: 262mm;
+    display: flex;
+    flex-direction: column;
+    break-after: page;
+  }
+  .cover-top { font-size: 9pt; letter-spacing: 0.6pt; color: var(--muted); text-transform: uppercase; }
+  .cover-band { height: 5pt; width: 70pt; background: var(--accent); margin: 70mm 0 14pt; border-radius: 2pt; }
+  .cover-kicker { font-size: 10pt; letter-spacing: 1.5pt; color: var(--accent); font-weight: 600; margin: 0 0 4pt; text-align: left; }
+  .cover-title { font-size: 34pt; font-weight: 600; margin: 0; line-height: 1.1; border: none; color: var(--ink); padding: 0; }
+  .cover-sub { font-size: 13pt; color: var(--muted); margin: 6pt 0 26pt; text-align: left; }
+  .cover-doc { font-size: 15pt; font-weight: 600; margin: 0 0 4pt; text-align: left; }
+  .cover-group { font-size: 11pt; margin: 0 0 22pt; text-align: left; color: var(--muted); }
+  .cover-team { width: 92mm; font-size: 9.5pt; margin: 0; }
+  .cover-team td { border-bottom: 0.5pt solid var(--rule); padding: 3pt 0; }
+  .cover-team td + td { color: var(--muted); text-align: right; }
+  .cover-foot { margin-top: auto; font-size: 8.5pt; color: var(--muted); text-align: left; border-top: 0.5pt solid var(--rule); padding-top: 6pt; }
+
+  /* Contents */
+  .toc { margin: 4pt 0 0; padding: 0; list-style: none; }
+  .toc li { display: flex; align-items: baseline; margin: 0 0 3.5pt; font-size: 9.8pt; text-align: left; }
+  .toc li .dots { flex: 1; border-bottom: 1.6pt dotted #c3c7cc; margin: 0 5pt; transform: translateY(-2.5pt); }
+  .toc li.sub { padding-left: 14pt; font-size: 9pt; color: var(--muted); }
+  .toc a { color: inherit; text-decoration: none; }
+
+  .lead { font-size: 10pt; }
+  pre {
+    font-family: Consolas, "Cascadia Mono", monospace;
+    font-size: 8.2pt;
+    background: #f6f7f8;
+    border: 0.5pt solid var(--rule);
+    border-radius: 3pt;
+    padding: 6pt 8pt;
+    margin: 3pt 0 8pt;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================== COUVERTURE ============================== -->
+<section class="cover">
+  <div class="cover-top">EPSI · Workshop 2026 · Master 2</div>
+  <div class="cover-band"></div>
+  <p class="cover-kicker">PROJECT RESILIENCE-ALPHA</p>
+  <h1 class="cover-title">Xijin Pink</h1>
+  <p class="cover-sub">Une plateforme de dons fictive face à un incident de sécurité</p>
+  <p class="cover-doc">Dossier d'ingénierie et de gouvernance</p>
+  <p class="cover-group">Groupe G2</p>
+  <table class="cover-team">
+    <tr><td>Julien Demogue</td><td>Services et API</td></tr>
+    <tr><td>Louis Marec</td><td>IA et données</td></tr>
+    <tr><td>Eric Girard</td><td>Infrastructure</td></tr>
+    <tr><td>Noé Filippi</td><td>Frontend</td></tr>
+    <tr><td>Sterenn</td><td>Frontend</td></tr>
+  </table>
+  <div class="cover-foot">
+    Octobre 2026. Toutes les données utilisées sont fictives. Les essais offensifs ont été menés
+    uniquement sur nos propres machines, à travers le hotspot RESILIENCE-G2.
+  </div>
+</section>
+
+<!-- ============================== SYNTHÈSE + SOMMAIRE ============================== -->
+<h1 style="margin-top:0">Synthèse</h1>
+<p class="lead">Xijin Pink est un prestataire de services de paiement fictif qui collecte des dons pour Octobre Rose. Nous l'avons construit pendant la semaine du workshop pour répondre à trois questions : quand une attaque frappe un service de paiement, est-ce qu'on la voit, est-ce qu'on comprend ce qui se passe, et est-ce que le service redevient utilisable ?</p>
+<p>La plateforme tourne entièrement sur le PC Hôte avec Docker Compose. Elle comprend un site de dons en React, trois services Node.js (authentification, paiement, prestataire de paiement simulé), une base MariaDB, un WAF Nginx qui sert de seule porte d'entrée, une chaîne d'observabilité Prometheus, Loki et Grafana, un détecteur d'anomalies par apprentissage automatique et un assistant RAG local. Pour la consigne additionnelle, nous avons ajouté une authentification par reconnaissance faciale reliée à un voyant ESP8266. L'ensemble démarre avec une seule commande.</p>
+<p>Sur une campagne d'attaques réelle (déni de service, bourrage d'identifiants, aspiration, injection, exfiltration), le détecteur a repéré les cinq catégories en 10 à 15 secondes, avec une AUROC proche de 0,95. Le WAF a renvoyé 4&nbsp;888 réponses 429 pendant un flood, et les 42 tests unitaires du dépôt passent. Les sections 9 à 11 relient ces choix techniques à l'analyse EBIOS RM, au PCA/PRA et aux exigences NIS2 et DORA.</p>
+
+<h2 style="margin-top:14pt">Sommaire</h2>
+<ul class="toc">
+  <li><a href="#s1">1. Contexte et objectifs</a><span class="dots"></span><span class="toc-page" data-ref="s1"></span></li>
+  <li><a href="#s2">2. Architecture et flux</a><span class="dots"></span><span class="toc-page" data-ref="s2"></span></li>
+  <li><a href="#s3">3. Décisions structurantes</a><span class="dots"></span><span class="toc-page" data-ref="s3"></span></li>
+  <li><a href="#s4">4. Nature de l'incident</a><span class="dots"></span><span class="toc-page" data-ref="s4"></span></li>
+  <li><a href="#s5">5. Détection</a><span class="dots"></span><span class="toc-page" data-ref="s5"></span></li>
+  <li><a href="#s6">6. Reprise du service</a><span class="dots"></span><span class="toc-page" data-ref="s6"></span></li>
+  <li><a href="#s7">7. Résultats des essais</a><span class="dots"></span><span class="toc-page" data-ref="s7"></span></li>
+  <li><a href="#s8">8. Sécurité</a><span class="dots"></span><span class="toc-page" data-ref="s8"></span></li>
+  <li><a href="#s9">9. Analyse de risques EBIOS RM</a><span class="dots"></span><span class="toc-page" data-ref="s9"></span></li>
+  <li><a href="#s10">10. PCA / PRA</a><span class="dots"></span><span class="toc-page" data-ref="s10"></span></li>
+  <li><a href="#s11">11. NIS2 et DORA</a><span class="dots"></span><span class="toc-page" data-ref="s11"></span></li>
+  <li><a href="#s12">12. Contributions de l'équipe</a><span class="dots"></span><span class="toc-page" data-ref="s12"></span></li>
+  <li><a href="#s13">13. Limites et suites</a><span class="dots"></span><span class="toc-page" data-ref="s13"></span></li>
+  <li><a href="#sA">Annexe A. Renvois vers le dépôt</a><span class="dots"></span><span class="toc-page" data-ref="sA"></span></li>
+  <li><a href="#sB">Annexe B. Démarrer et vérifier la plateforme</a><span class="dots"></span><span class="toc-page" data-ref="sB"></span></li>
+</ul>
+
+<!-- ============================== 1 ============================== -->
+<h1 id="s1" class="newpage" style="margin-top:0">1. Contexte et objectifs</h1>
+<p>Le sujet nous place dans la peau de l'équipe technique d'un prestataire de paiement. Le système doit subir un incident de sécurité contrôlé, le détecter et revenir à un état utilisable sans réparation à la main. Le jury doit pouvoir suivre l'état du service avant, pendant et après l'incident.</p>
+<p>Dès le premier jour, nous avons fixé une définition de la reprise qui a guidé le reste du projet. Un conteneur qui redémarre ne prouve rien : l'API peut rester muette, un paiement peut échouer, une transaction peut rester bloquée. Nous considérons le service comme rétabli quand l'API répond, qu'un nouveau don fictif atteint le statut <code>paid</code> et que les données restent cohérentes.</p>
+<h2>Périmètre</h2>
+<p>Le laboratoire compte trois postes. Le PC Hôte fait tourner toute la plateforme, le PC Attaquant lance les scénarios d'attaque, et un PC IA facultatif peut héberger Ollama. Tout passe par le point d'accès Windows <code>RESILIENCE-G2</code> (réseau 192.168.137.0/24, hôte en 192.168.137.1). Il n'y a ni environnement public ni préproduction. Les réseaux du campus, les autres équipes et les services Internet sont hors périmètre. Les données sont fictives : adresses de test, montants inventés, carte de test 4242 4242 4242 4242.</p>
+<p>Ce dossier présente les décisions et les résultats. Le code, les contrats d'interface et les procédures détaillées restent dans le dépôt, livré dans l'archive <code>Workshop2026-M2-G2-Code.zip</code>. Chaque section indique les chemins à consulter et l'annexe A en donne la liste complète.</p>
+
+<!-- ============================== 2 ============================== -->
+<h1 id="s2">2. Architecture et flux</h1>
+<figure>
+<svg viewBox="0 0 900 404" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architecture de la plateforme Xijin Pink">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/>
+    </marker>
+    <style>
+      .zone { fill: #f7f8f9; stroke: #c9cdd3; stroke-width: 1; stroke-dasharray: 4 3; }
+      .host { fill: #ffffff; stroke: #9aa0a8; stroke-width: 1.2; }
+      .box { fill: #ffffff; stroke: #6b7280; stroke-width: 1; }
+      .exp { fill: #fbeaf1; stroke: #a3164f; stroke-width: 1.6; }
+      .t { font-size: 11px; fill: #1d2125; }
+      .tb { font-size: 11px; fill: #1d2125; font-weight: 600; }
+      .ts { font-size: 9px; fill: #5d636b; }
+      .zl { font-size: 9.5px; font-weight: 600; fill: #6b7280; letter-spacing: 0.6px; }
+      .a { stroke: #4b5563; stroke-width: 1.2; fill: none; marker-end: url(#arr); }
+    </style>
+  </defs>
+
+  <!-- Hotspot -->
+  <rect class="zone" x="6" y="6" width="150" height="392" rx="8"/>
+  <text class="zl" x="16" y="24">HOTSPOT RESILIENCE-G2</text>
+  <text class="ts" x="16" y="37">192.168.137.0/24</text>
+  <rect class="box" x="18" y="70" width="126" height="46" rx="5"/>
+  <text class="tb" x="81" y="90" text-anchor="middle">PC Attaquant</text>
+  <text class="ts" x="81" y="105" text-anchor="middle">redteam/campaign.py</text>
+  <rect class="box" x="18" y="150" width="126" height="46" rx="5"/>
+  <text class="tb" x="81" y="170" text-anchor="middle">Donateur / jury</text>
+  <text class="ts" x="81" y="185" text-anchor="middle">navigateur</text>
+  <rect class="box" x="18" y="330" width="126" height="46" rx="5"/>
+  <text class="tb" x="81" y="350" text-anchor="middle">ESP8266</text>
+  <text class="ts" x="81" y="365" text-anchor="middle">LED rouge / verte</text>
+
+  <!-- PC Hôte -->
+  <rect class="host" x="168" y="6" width="726" height="392" rx="8"/>
+  <text class="zl" x="180" y="24">PC HÔTE · DOCKER COMPOSE</text>
+  <text class="ts" x="180" y="37">réseau bridge « interne »</text>
+
+  <rect class="exp" x="182" y="100" width="96" height="76" rx="5"/>
+  <text class="tb" x="230" y="128" text-anchor="middle">WAF Nginx</text>
+  <text class="ts" x="230" y="143" text-anchor="middle">:8080</text>
+  <text class="ts" x="230" y="156" text-anchor="middle">seule entrée</text>
+
+  <!-- SI métier -->
+  <rect class="zone" x="294" y="46" width="296" height="290" rx="6"/>
+  <text class="zl" x="304" y="62">SI MÉTIER</text>
+  <rect class="box" x="306" y="70" width="272" height="30" rx="4"/>
+  <text class="t" x="442" y="89" text-anchor="middle">frontend · React + Tailwind · :5173</text>
+  <rect class="box" x="306" y="124" width="128" height="44" rx="4"/>
+  <text class="tb" x="370" y="142" text-anchor="middle">auth-service</text>
+  <text class="ts" x="370" y="157" text-anchor="middle">:3001 · bcrypt, JWT</text>
+  <rect class="box" x="450" y="124" width="128" height="44" rx="4"/>
+  <text class="tb" x="514" y="142" text-anchor="middle">payment-api</text>
+  <text class="ts" x="514" y="157" text-anchor="middle">:3002 · dons, webhook</text>
+  <rect class="box" x="306" y="204" width="128" height="44" rx="4"/>
+  <text class="tb" x="370" y="222" text-anchor="middle">MariaDB 11</text>
+  <text class="ts" x="370" y="237" text-anchor="middle">volume persistant</text>
+  <rect class="box" x="450" y="204" width="128" height="44" rx="4"/>
+  <text class="tb" x="514" y="222" text-anchor="middle">psp-simulator</text>
+  <text class="ts" x="514" y="237" text-anchor="middle">:3003 · PSP simulé</text>
+  <rect class="box" x="306" y="276" width="272" height="44" rx="4"/>
+  <text class="tb" x="442" y="294" text-anchor="middle">face-auth · :3005</text>
+  <text class="ts" x="442" y="309" text-anchor="middle">identifiant, visage, mot de passe (vérifié par auth-service)</text>
+
+  <!-- Observabilité et IA -->
+  <rect class="zone" x="604" y="46" width="280" height="346" rx="6"/>
+  <text class="zl" x="614" y="62">OBSERVABILITÉ ET IA</text>
+  <rect class="box" x="616" y="70" width="256" height="30" rx="4"/>
+  <text class="t" x="744" y="89" text-anchor="middle">Promtail, Loki · journaux JSON</text>
+  <rect class="box" x="616" y="124" width="256" height="30" rx="4"/>
+  <text class="t" x="744" y="143" text-anchor="middle">Prometheus · métriques toutes les 5 s</text>
+  <rect class="box" x="616" y="178" width="256" height="46" rx="4"/>
+  <text class="tb" x="744" y="197" text-anchor="middle">Détecteur d'anomalies · :3010</text>
+  <text class="ts" x="744" y="212" text-anchor="middle">ACP + Isolation Forest, seuils appris</text>
+  <rect class="exp" x="616" y="256" width="124" height="46" rx="4"/>
+  <text class="tb" x="678" y="275" text-anchor="middle">Grafana :3000</text>
+  <text class="ts" x="678" y="290" text-anchor="middle">supervision, SOC</text>
+  <rect class="box" x="748" y="256" width="124" height="46" rx="4"/>
+  <text class="tb" x="810" y="275" text-anchor="middle">Assistant RAG</text>
+  <text class="ts" x="810" y="290" text-anchor="middle">:3020 · lecture seule</text>
+  <rect class="box" x="616" y="334" width="124" height="40" rx="4" stroke-dasharray="3 2"/>
+  <text class="t" x="678" y="351" text-anchor="middle">docs/, runbooks</text>
+  <text class="ts" x="678" y="365" text-anchor="middle">Markdown</text>
+  <rect class="box" x="748" y="334" width="124" height="40" rx="4"/>
+  <text class="t" x="810" y="351" text-anchor="middle">Ollama (hôte)</text>
+  <text class="ts" x="810" y="365" text-anchor="middle">qwen2.5:3b</text>
+
+  <!-- Flux -->
+  <line class="a" x1="144" y1="93" x2="180" y2="124"/>
+  <line class="a" x1="144" y1="173" x2="180" y2="152"/>
+  <path class="a" d="M278,108 H290 V85 H304"/>
+  <path class="a" d="M278,116 H514 V122"/>
+  <path class="a" d="M278,146 H304"/>
+  <path class="a" d="M370,168 V202"/>
+  <path class="a" d="M466,168 L437,202"/>
+  <path class="a" d="M534,168 V202"/>
+  <path class="a" d="M558,204 V170"/>
+  <text class="ts" x="529" y="190" text-anchor="end">session</text>
+  <text class="ts" x="563" y="190">HMAC</text>
+  <path class="a" d="M306,298 H232 V353 H146"/>
+  <text class="ts" x="238" y="346">POST /led</text>
+  <path class="a" d="M590,85 H614"/>
+  <path class="a" d="M590,139 H614"/>
+  <path class="a" d="M872,85 H880 V201 H874"/>
+  <path class="a" d="M744,154 V176"/>
+  <path class="a" d="M678,224 V254"/>
+  <path class="a" d="M810,224 V254"/>
+  <text class="ts" x="816" y="243">/alerts</text>
+  <path class="a" d="M732,334 L776,304"/>
+  <path class="a" d="M830,334 V304"/>
+
+  <!-- Légende -->
+  <rect class="exp" x="252" y="362" width="12" height="10" rx="2"/>
+  <text class="ts" x="270" y="371">exposé sur le hotspot (8080 et 3000)</text>
+</svg>
+<figcaption>Figure 1. Architecture déployée sur le PC Hôte. Grafana lit Prometheus et Loki ; le détecteur lit les journaux et les métriques puis publie ses alertes.</figcaption>
+</figure>
+
+<h2>2.1 Rôle des composants</h2>
+<table>
+  <tr><th style="width:17%">Composant</th><th>Rôle</th><th style="width:20%">Technologie</th></tr>
+  <tr><td><code>waf</code></td><td>Seule entrée HTTP : routage vers le site et les API, filtrage, limitation de débit, journal d'accès JSON.</td><td>Nginx 1.27</td></tr>
+  <tr><td><code>frontend</code></td><td>Site de dons : accueil, don, retour de paiement, classement, historique, profil, connexion et inscription.</td><td>React, Vite, Tailwind</td></tr>
+  <tr><td><code>auth-service</code></td><td>Comptes, connexion, profil, émission des jetons JWT.</td><td>Node.js, Express</td></tr>
+  <tr><td><code>payment-api</code></td><td>Dons et transactions, historique, classement, titres de donateur, réception du webhook du PSP.</td><td>Node.js, Express</td></tr>
+  <tr><td><code>psp-simulator</code></td><td>Prestataire de paiement simulé : session de paiement, page de confirmation, webhook signé.</td><td>Node.js, Express</td></tr>
+  <tr><td><code>mariadb</code></td><td>Tables <code>users</code>, <code>transactions</code> et <code>titles</code>.</td><td>MariaDB 11</td></tr>
+  <tr><td><code>promtail</code>, <code>loki</code>, <code>prometheus</code></td><td>Collecte et stockage centralisé des journaux de tous les conteneurs ; métriques des services toutes les 5 secondes, gardées 7 jours.</td><td>Loki 3.1, Prometheus 2.54</td></tr>
+  <tr><td><code>grafana</code></td><td>Tableaux de supervision et de SOC, chargés depuis le dépôt au démarrage.</td><td>Grafana 11.2</td></tr>
+  <tr><td><code>anomaly-detector</code></td><td>Détection d'anomalies par apprentissage, alertes, métriques de score.</td><td>Python, scikit-learn, FastAPI</td></tr>
+  <tr><td><code>rag-assistant</code></td><td>Assistant opérateur sur la documentation et les runbooks.</td><td>Python, Ollama</td></tr>
+  <tr><td><code>face-auth</code></td><td>Authentification faciale (enrôlement, identification, contrôle du mot de passe) et back-office.</td><td>Python, OpenCV</td></tr>
+  <tr><td><code>esp8266-led</code></td><td>Voyant d'état de l'authentification, sur le hotspot.</td><td>ESP8266, PlatformIO</td></tr>
+</table>
+<p class="small">Pour le développement, le fichier compose publie aussi les ports des services (3001 à 3003), de phpMyAdmin (8081), de Prometheus (9090) et de Loki (3100). Pendant la démonstration, seuls 8080 et 3000 doivent rester ouverts sur le hotspot ; les autres se ferment dans le pare-feu de l'hôte.</p>
+
+<h2>2.2 Parcours d'un don</h2>
+<ol>
+  <li>Le donateur choisit un montant, puis saisit la carte de test. Le formulaire contrôle la carte dans le navigateur et aucune donnée de carte n'est envoyée au serveur.</li>
+  <li>Le site appelle <code>POST /api/donations/checkout</code> à travers le WAF. <code>payment-api</code> valide le montant (en centimes), la devise et l'adresse e-mail si le don est anonyme, enregistre une transaction <code>pending</code> et ouvre une session chez le PSP simulé.</li>
+  <li>Le navigateur est redirigé vers la page de paiement du PSP, où le donateur confirme (ou simule un refus).</li>
+  <li>Le PSP appelle <code>POST /api/donations/webhook</code> avec un corps signé en HMAC-SHA256 dans l'en-tête <code>x-signature-psp</code>.</li>
+  <li><code>payment-api</code> recalcule la signature, la compare en temps constant et passe la transaction à <code>paid</code> ou <code>failed</code>. Une signature invalide est rejetée (401) et journalisée comme alerte.</li>
+  <li>Le donateur revient sur le site. Ses dons payés alimentent son historique, le classement et son titre de donateur.</li>
+</ol>
+<p>La base ne garde que le nécessaire : e-mail, montant, devise, statut, références et horodatages. Un donateur connecté est rattaché à son compte, sinon l'e-mail suffit. Le détail est dans <code>docs/payment-flow.md</code> et chaque service publie sa spécification OpenAPI sur <code>/api-docs</code>.</p>
+
+<h2>2.3 Flux de supervision</h2>
+<p>Les trois services Node.js partagent le même middleware de télémétrie (<code>src/middleware/telemetry.js</code>). Il attribue un <code>request_id</code> à chaque requête, écrit une ligne JSON <code>http_access</code> (méthode, modèle de route, statut, durée, octets, IP cliente) et expose des métriques <code>prom-client</code> sur <code>/metrics</code>. Les événements métier et de sécurité (<code>checkout_created</code>, <code>webhook_received</code>, <code>webhook_invalid_signature</code>, <code>payment_confirmed</code>, <code>login_failed</code>, <code>validation_rejected</code>) portent le même identifiant, ce qui permet de rattacher un effet à la requête qui l'a produit. Le WAF écrit son propre journal JSON et transmet la vraie IP du client dans <code>X-Forwarded-For</code>.</p>
+<p>Promtail lit les journaux des conteneurs et les pousse vers Loki. Prometheus interroge les <code>/metrics</code> toutes les 5 secondes. Aucun journal ne contient de corps de requête, de jeton, de mot de passe ni le secret du webhook. Le contrat complet est décrit dans <code>docs/api/telemetry-contract.md</code>.</p>
+
+<!-- ============================== 3 ============================== -->
+<h1 id="s3">3. Décisions structurantes</h1>
+<table>
+  <tr><th style="width:27%">Décision</th><th style="width:40%">Pourquoi</th><th>Ce que nous acceptons</th></tr>
+  <tr><td>Simuler le PSP dans la plateforme plutôt qu'utiliser Stripe en mode test</td><td>Pas de dépendance à Internet pendant la démo et le clip en une prise, aucun tiers dans le périmètre d'attaque. La forme réelle est conservée : session de paiement puis webhook signé.</td><td>Ni relance du webhook ni 3-D Secure ; sessions gardées en mémoire.</td></tr>
+  <tr><td>Une seule base MariaDB pour auth-service et payment-api</td><td>Simple à exploiter en quatre jours, une seule base à protéger et à sauvegarder.</td><td>Couplage entre les deux services. Une base par service serait plus propre.</td></tr>
+  <tr><td>WAF Nginx écrit à la main plutôt que ModSecurity avec l'OWASP CRS</td><td>Règles lisibles, image légère, journal JSON adapté au SOC.</td><td>Couverture plus étroite que le CRS. La bascule est décrite dans <code>services/waf/README.md</code>.</td></tr>
+  <tr><td>Détecter d'abord à partir du journal du WAF</td><td>Un service qui tombe cesse d'écrire. Le WAF, lui, continue de voir les 502 et les 504.</td><td>Si le WAF tombe, la détection perd sa source principale.</td></tr>
+  <tr><td>Apprendre le comportement normal et en déduire le seuil</td><td>Exigence du sujet, et c'est ce qui permet de repérer une attaque jamais vue.</td><td>Il faut un trafic normal réaliste, erreurs ordinaires comprises.</td></tr>
+  <tr><td>Prometheus, Loki et Grafana plutôt qu'Elastic</td><td>Le PC Hôte a peu de mémoire et le sujet écarte Elastic.</td><td>Recherche plein texte plus limitée.</td></tr>
+  <tr><td>Supervision dans Grafana, tableaux versionnés dans le dépôt</td><td>Chargés automatiquement au démarrage, ils lisent directement Prometheus et Loki, sans code à maintenir.</td><td>Mise en page moins libre qu'une application dédiée.</td></tr>
+  <tr><td>Assistant RAG local sur Ollama avec <code>qwen2.5:3b</code></td><td>Tient dans 8 Go, rien ne sort du labo, bon niveau en français.</td><td>Réponses parfois approximatives, d'où les citations de sources.</td></tr>
+  <tr><td>Secrets générés au premier démarrage dans un <code>.env</code> ignoré par Git</td><td>Aucun secret dans le dépôt et un démarrage en une commande.</td><td>Le fichier reste en clair sur l'hôte.</td></tr>
+  <tr><td>Démarrage en une commande (<code>scripts/start.sh</code> ou <code>start.ps1</code>)</td><td>L'équipe et le jury relancent la même plateforme de la même façon.</td><td>Premier lancement long (construction des images, modèles).</td></tr>
+</table>
+
+<!-- ============================== 4 ============================== -->
+<h1 id="s4">4. Nature de l'incident</h1>
+<h2>4.1 Scénarios d'attaque</h2>
+<p>Les attaques sont des scripts Python reproductibles (<code>redteam/attacks.py</code>) lancés depuis le PC Attaquant contre le WAF. Leur trafic porte trois adresses sources (192.168.137.201 à 203, via <code>X-Forwarded-For</code>), distinctes de celles des utilisateurs normaux. L'intensité est volontairement bornée pour tourner sur un ordinateur portable.</p>
+<table>
+  <tr><th style="width:13%">Catégorie</th><th style="width:22%">Cible</th><th style="width:33%">Technique</th><th>Effet observable</th></tr>
+  <tr><td><code>availability</code></td><td><code>POST /api/donations/checkout</code></td><td>Flood de 40 clients concurrents pendant 60 s, avec montée progressive.</td><td>Débit et latence qui s'envolent, erreurs 5xx, réponses 429 du WAF.</td></tr>
+  <tr><td><code>auth-abuse</code></td><td><code>POST /api/auth/login</code></td><td>Bourrage d'identifiants depuis quelques adresses.</td><td>Rafale de 401 et d'événements <code>login_failed</code>.</td></tr>
+  <tr><td><code>scraping</code></td><td><code>GET /api/donations/leaderboard</code></td><td>Énumération à haute fréquence par un robot.</td><td>Débit concentré sur une route et une adresse.</td></tr>
+  <tr><td><code>injection</code></td><td>Entrées de connexion et de paiement</td><td>Vraies charges SQL, XSS et traversée de répertoire.</td><td>Rafale de 400 (validation) et de 403 (WAF).</td></tr>
+  <tr><td><code>exfiltration</code></td><td>Historique authentifié et classement</td><td>Lecture massive depuis une adresse.</td><td>Volume de données sortantes anormal.</td></tr>
+</table>
+
+<h2>4.2 L'incident mis en avant</h2>
+<p>Pour la démonstration, nous mettons en avant le déni de service sur le paiement. C'est l'incident dont l'effet métier se voit le mieux : la latence grimpe, des dons n'aboutissent plus, puis le service revient. Son critère de reprise est aussi le plus net, puisqu'il suffit de refaire un don. Les quatre autres scénarios servent à entraîner et à évaluer le détecteur, et montrent que la chaîne ne se limite pas à un seul type d'attaque.</p>
+<p>Les sondes d'injection ne peuvent pas aboutir, parce que les requêtes SQL sont paramétrées et les entrées validées. Leur intérêt est ailleurs : elles laissent une empreinte (rejets en série, routes variées, outil reconnaissable) que le détecteur apprend à repérer et que le WAF bloque en partie avant qu'elle n'atteigne les services.</p>
+
+<h2>4.3 Campagne et étiquetage</h2>
+<p><code>redteam/campaign.py</code> commence par du trafic normal seul, qui sert de référence « avant ». Chaque attaque est ensuite injectée pendant que le trafic normal continue, avec des pauses entre les épisodes, puis vient une phase de retour au calme. Le script écrit un manifeste avec l'heure de début et de fin de chaque épisode. Le trafic normal vient de <code>tools/traffic/normal_traffic.py</code>, qui joue de vrais parcours (inscription, connexion, don complet, consultation) et commet les erreurs ordinaires d'un utilisateur : mauvais mot de passe, montant invalide, paiement abandonné. Sans elles, le modèle apprendrait que tout 401 est une attaque, ce qui reviendrait à un seuil codé en dur. Les journaux sont ensuite exportés de Loki (<code>tools/dataset/export_loki.py</code>) et chaque fenêtre est étiquetée d'après le manifeste.</p>
+
+<!-- ============================== 5 ============================== -->
+<h1 id="s5">5. Détection</h1>
+<figure>
+  <div class="pipe">
+    <div><b>Journaux</b><code>http_access</code> du WAF et des services</div><span>›</span>
+    <div><b>Fenêtres</b>10 s, pas de 5 s, une par service</div><span>›</span>
+    <div><b>17 indicateurs</b>débit, erreurs, latence, octets, IP, routes</div><span>›</span>
+    <div class="key"><b>Score ACP</b>comparé au seuil appris du service</div><span>›</span>
+    <div><b>Persistance</b>3 fenêtres suspectes sur 4</div><span>›</span>
+    <div class="key"><b>Alerte</b><code>firing</code> puis <code>resolved</code></div>
+  </div>
+  <figcaption>Figure 2. Chaîne de détection, de la ligne de journal à l'alerte.</figcaption>
+</figure>
+
+<h2>5.1 Des journaux aux observations</h2>
+<p>Le détecteur ne juge pas les requêtes une par une. Une attaque est un comportement qui dure : un flood, une série d'échecs de connexion, une aspiration méthodique. L'unité d'analyse est donc un service (<code>waf</code>, <code>payment-api</code>, <code>auth-service</code>, <code>psp-simulator</code>) sur une fenêtre de 10 secondes, recalculée toutes les 5 secondes. Pour chaque fenêtre, nous calculons 17 indicateurs (FeatureSpec v2) : nombre et débit de requêtes, taux d'erreurs 4xx et 5xx, latences médiane et p95, octets sortants (p95, somme, moyenne par requête), nombre d'IP distinctes et part de la première, nombre de routes distinctes et part de la première, taux d'échecs d'authentification, signatures de webhook invalides, et enfin CPU et mémoire du service lus dans Prometheus. Les indicateurs à forte dispersion (volumes, latences, octets) passent par un log1p avant la standardisation, pour qu'un pic ordinaire ne ressemble pas à une attaque. Les appels techniques sur <code>/metrics</code> et <code>/health</code> sont exclus.</p>
+<p>Nous ne calculons pas d'observation par adresse IP. Dans nos essais, tout le trafic normal vient d'une même machine et « normal pour une IP » n'aurait pas de sens. Les adresses dominantes apparaissent en revanche dans les éléments de preuve de l'alerte, pour qu'on puisse les bloquer au WAF.</p>
+
+<h2>5.2 Modèle à deux étages</h2>
+<p>Le premier étage est non supervisé : il n'a vu que du trafic normal. Les indicateurs sont standardisés, puis une analyse en composantes principales (ACP) conserve 95 % de la variance. Le score d'anomalie est l'erreur de reconstruction : plus une fenêtre s'éloigne de ce que le modèle sait reconstruire, plus il monte. L'erreur indicateur par indicateur fournit directement l'explication de l'alerte (valeur observée face à la valeur attendue). Un Isolation Forest de 200 arbres, entraîné sur les mêmes données, sert de point de comparaison.</p>
+<p>Le seuil n'est jamais choisi à la main. Il correspond au 95<sup>e</sup> percentile des scores obtenus sur un lot de trafic normal mis de côté, et il est calculé service par service, avec un seuil global en secours. Un service calme comme auth-service garde ainsi un seuil bas, et une rafale de 401 n'y est pas noyée dans la variance d'un service plus bruyant.</p>
+<p>Le second étage est un classifieur supervisé (Gradient Boosting) entraîné sur les fenêtres étiquetées. Il propose la catégorie probable parmi les cinq de la campagne. En dessous de 0,5 de confiance, il s'abstient et répond <code>unknown</code>, ce qui oriente vers la procédure générique. Apprentissage et test sont séparés par campagne et non au hasard, car deux fenêtres voisines se ressemblent trop pour qu'un tirage aléatoire donne une mesure honnête.</p>
+
+<h2>5.3 Cycle de vie d'une anomalie</h2>
+<p>Une fenêtre suspecte isolée ne déclenche rien. Le service passe en attente (PENDING) dès la première, puis en alerte (FIRING) quand 3 des 4 dernières fenêtres sont suspectes. Il revient à la normale (RESOLVED) après 3 fenêtres normales consécutives. Avec un pas de 5 secondes, une attaque franche déclenche l'alerte en 10 à 15 secondes, ce qui laisse le temps de montrer toute la chaîne dans un clip de 60 secondes. Un service sans trafic est considéré comme normal : l'absence de requêtes n'est pas une anomalie en soi, et la panne d'un service se lit de toute façon dans les 502 et 504 du WAF.</p>
+<p>Le retour à RESOLVED compte autant que le déclenchement. C'est un composant indépendant qui confirme que le comportement est redevenu normal, ce qui complète le test métier (un nouveau don payé) et va plus loin que « le conteneur tourne ».</p>
+
+<h2>5.4 Contenu et diffusion d'une alerte</h2>
+<p>À chaque changement d'état, <code>ai/anomaly-detection/live_scorer.py</code> produit une alerte JSON conforme à <code>docs/api/alert-contract.md</code> : identifiant stable, statut <code>firing</code> ou <code>resolved</code>, service concerné, score et seuil, sévérité (haute au-delà de deux fois le seuil), catégorie et confiance, indicateurs les plus déviants, version du modèle. Elle est écrite dans le journal, donc visible dans Loki et dans le SOC, conservée sur <code>/alerts</code> pour l'assistant RAG, et envoyée en POST à l'adresse <code>REMEDIATION_URL</code> quand celle-ci est configurée. Le détecteur publie aussi <code>anomaly_score</code>, <code>anomaly_threshold</code>, <code>anomaly_state</code> et <code>anomaly_alerts_total</code> pour Grafana.</p>
+
+<h2>5.5 Rendre visibles l'avant, le pendant et l'après</h2>
+<p>Deux tableaux Grafana sont provisionnés au démarrage. « Supervision &amp; Résilience » affiche le débit, le taux de 5xx, la latence p95 et la mémoire de chaque service, puis le score d'anomalie face au seuil et la marge entre les deux. Tant que la marge reste sous zéro, le service est normal ; pendant l'incident, on la voit passer au-dessus puis redescendre. « SOC / SIEM » regroupe les blocages (403, 405) et limitations (429) du WAF, le nombre de services en alerte, les échecs de connexion et les signatures de webhook invalides par minute, et un journal de sécurité qui croise WAF, authentification et alertes du détecteur.</p>
+
+<h2>5.6 Assistant opérateur (RAG)</h2>
+<p>L'assistant (<code>ai/rag-assistant/</code>) répond aux questions d'un opérateur à partir de la documentation du dépôt et des runbooks, c'est-à-dire les fichiers Markdown de <code>docs/</code>. Tout tourne en local sur Ollama : <code>nomic-embed-text</code> pour les vecteurs, <code>qwen2.5:3b</code> pour la génération, bien en dessous de la limite de 8 milliards de paramètres. La route <code>/explain</code> récupère la dernière alerte du détecteur, oriente la recherche vers le runbook de sa catégorie et répond en citant ses sources. L'alerte est injectée comme donnée non fiable, car ses champs peuvent contenir des chaînes venues d'un attaquant, et le prompt système interdit de les traiter comme des instructions. L'assistant ne fait que lire : il n'a ni outil, ni accès au système, ni secret, et ce n'est pas lui qui pilote la remédiation.</p>
+
+<!-- ============================== 6 ============================== -->
+<h1 id="s6">6. Reprise du service</h1>
+<h2>6.1 Mécanismes en place</h2>
+<p>La première ligne est l'absorption à l'entrée. Le WAF limite chaque adresse à 20 requêtes par seconde avec une marge de 40, et répond 429 au-delà. Un flood venu de quelques adresses est donc freiné avant d'atteindre <code>payment-api</code>, et les autres donateurs continuent d'être servis.</p>
+<p>Viennent ensuite les mécanismes de Docker. Tous les conteneurs sont déclarés en <code>restart: unless-stopped</code> : un service qui plante redémarre seul, y compris après un redémarrage de l'hôte. MariaDB a un contrôle de santé (toutes les 10 secondes, 10 essais) et les services qui en dépendent attendent qu'elle soit prête avant de démarrer.</p>
+<p>La plateforme sait aussi repartir d'un clone neuf sans intervention. Si aucun modèle n'existe au premier démarrage, le détecteur en entraîne un sur des données synthétiques. L'assistant RAG démarre même quand Ollama n'est pas prêt et construit son index à la première question. <code>scripts/verify.sh</code> contrôle ensuite les onze points de santé de la plateforme.</p>
+<p>Côté données, les transactions sont écrites dans InnoDB sur un volume persistant, si bien qu'un redémarrage de conteneur ne perd rien de ce qui a été validé. La mise à jour par webhook est idempotente : rejouer la même confirmation laisse la transaction dans le même état.</p>
+
+<h2>6.2 Réponse attendue selon le type d'incident</h2>
+<p>Rétablir la disponibilité et corriger une compromission sont deux problèmes différents. Après un déni de service, il suffit que le service réponde de nouveau et qu'un don passe. Après une injection ou une exfiltration, il faut contenir, vérifier l'intégrité des données et révoquer ce qui doit l'être ; un service qui répond ne dit rien de l'état des données. Le contrat d'alerte associe donc à chaque catégorie une réponse et une preuve de rétablissement propres, détaillées dans les runbooks de <code>docs/runbooks/</code>.</p>
+<table>
+  <tr><th style="width:15%">Catégorie</th><th style="width:47%">Réponse attendue</th><th>Preuve de rétablissement</th></tr>
+  <tr><td><code>availability</code></td><td>Resserrer la limite du WAF pour les adresses en cause, redémarrer ou dupliquer <code>payment-api</code>.</td><td>Un nouveau don atteint <code>paid</code>.</td></tr>
+  <tr><td><code>auth-abuse</code></td><td>Bloquer les adresses sources au WAF, limiter <code>/login</code>.</td><td>Un compte légitime se connecte.</td></tr>
+  <tr><td><code>injection</code></td><td>Durcir la règle WAF, bloquer l'adresse, contrôler l'intégrité, restaurer en cas de doute.</td><td>Contrôle d'intégrité réussi et don payé.</td></tr>
+  <tr><td><code>exfiltration</code></td><td>Contenir en bloquant l'adresse, révoquer les jetons concernés.</td><td>Plus de volume sortant anormal.</td></tr>
+  <tr><td><code>unknown</code></td><td>Procédure générique : redémarrer la cible, resserrer le WAF.</td><td>Don payé et score stable sous le seuil.</td></tr>
+</table>
+<p>Chaque runbook prévoit un cas d'escalade. Si le rétablissement échoue deux fois de suite, ou si une trace montre qu'une charge a réellement abouti (erreur SQL dans les journaux par exemple), l'opérateur arrête et prévient un coach.</p>
+
+<!-- ============================== 7 ============================== -->
+<h1 id="s7">7. Résultats des essais</h1>
+<table>
+  <tr><th style="width:23%">Essai</th><th style="width:33%">Méthode</th><th>Résultat</th></tr>
+  <tr><td>Tests unitaires des services Node.js</td><td><code>node --test</code>, base et PSP remplacés par des doublures</td><td>auth-service 10/10, payment-api 12/12, psp-simulator 7/7</td></tr>
+  <tr><td>Tests unitaires du détecteur</td><td><code>unittest</code> sur données synthétiques</td><td>8/8</td></tr>
+  <tr><td>Tests de l'authentification faciale</td><td><code>unittest</code> : réessai, blocage progressif, calcul de similarité</td><td>5/5</td></tr>
+  <tr><td>Détection sur données réelles</td><td>Campagne complète sur la plateforme, apprentissage et test sur des campagnes distinctes</td><td>5 catégories sur 5 détectées, alerte 10 à 15 s après le début de l'attaque, AUROC ≈ 0,95, exactitude du classifieur de catégorie ≈ 0,93</td></tr>
+  <tr><td>WAF</td><td>Routage, requêtes malveillantes, flood</td><td>Signatures bloquées en 403, 4&nbsp;888 réponses 429 pendant le flood</td></tr>
+  <tr><td>Démarrage en une commande</td><td><code>start.sh</code> puis <code>verify.sh</code>, y compris depuis un clone neuf</td><td>11 points de santé sur 11</td></tr>
+  <tr><td>Reconnaissance faciale</td><td>Photos réelles, même personne et personnes différentes</td><td>Similarité ≈ 0,74 pour une même personne, ≈ 0,10 entre personnes différentes (seuil 0,363)</td></tr>
+</table>
+<p class="small">Les tests unitaires ont été relancés le 22 octobre 2026 sur la branche principale. Les autres résultats sont consignés dans l'historique Git (commits aa6ef0b, 5a846dc et a1c582d) et dans <code>services/face-auth/README.md</code>.</p>
+<p>Le délai de détection correspond à ce que la conception prévoit : trois fenêtres suspectes avec un pas de 5 secondes. Une AUROC de 0,95 indique que le score sépare bien le trafic normal du trafic d'attaque. Ces chiffres restent ceux d'une campagne jouée sur un seul ordinateur portable, et nous ne les présentons pas comme une performance générale. Une mesure manque encore : le nombre de fausses alertes par heure sur du trafic purement normal. C'est elle qui dira si le détecteur est supportable en exploitation. Côté reconnaissance faciale, l'écart entre 0,74 et 0,10 laisse une marge confortable autour du seuil de 0,363, mais il n'a été mesuré que sur quelques visages.</p>
+
+<!-- ============================== 8 ============================== -->
+<h1 id="s8">8. Sécurité</h1>
+<h2>8.1 Défense en profondeur</h2>
+<table>
+  <tr><th style="width:13%">Couche</th><th>Mesures</th><th style="width:24%">Où le vérifier</th></tr>
+  <tr><td>Réseau</td><td>Un réseau Docker interne unique. La base, le PSP, Loki, Prometheus et le moteur Docker ne sont pas destinés au hotspot. Promtail accède au socket Docker en lecture seule.</td><td><code>infra/docker/docker-compose.yml</code></td></tr>
+  <tr><td>Entrée</td><td>WAF comme seule entrée : limitation de débit par adresse, blocage des motifs de traversée, SQLi, XSS et Log4Shell dans le chemin et les paramètres (403), méthodes non standard refusées (405), corps limité à 1 Mo, délai de 10 s, version du serveur masquée, en-têtes <code>X-Frame-Options</code>, <code>nosniff</code> et <code>Referrer-Policy</code>.</td><td><code>services/waf/nginx.conf</code></td></tr>
+  <tr><td>Application</td><td>Validation de toutes les entrées (e-mail, montant, devise, longueurs), requêtes SQL paramétrées, mots de passe hachés avec bcrypt (10 tours, 8 caractères minimum), jetons JWT signés, même message d'erreur que le compte existe ou non.</td><td><code>services/*/src/</code></td></tr>
+  <tr><td>Paiement</td><td>Webhook signé en HMAC-SHA256 et comparé en temps constant, signatures invalides rejetées et remontées au SOC. Aucune donnée de carte ne quitte le navigateur.</td><td><code>services/payment-api/src/signature.js</code></td></tr>
+  <tr><td>Journaux</td><td>JSON structuré, corrélé par <code>request_id</code>, sans corps, jeton, mot de passe ni secret. Événements d'audit à la création du paiement et à sa confirmation.</td><td><code>src/middleware/telemetry.js</code></td></tr>
+  <tr><td>Secrets</td><td>Générés au premier démarrage (24 octets aléatoires par <code>openssl rand</code>) dans un <code>.env</code> ignoré par Git. Aucun secret dans le dépôt.</td><td><code>scripts/setup.sh</code></td></tr>
+  <tr><td>IA</td><td>Assistant en lecture seule, sans outil, alerte traitée comme donnée non fiable.</td><td><code>ai/rag-assistant/</code></td></tr>
+</table>
+
+<h2>8.2 Fonction SOC / SIEM</h2>
+<p>Le SOC s'appuie sur Loki et sur le tableau Grafana « SOC / SIEM ». Il croise trois sources : le journal du WAF (blocages, limitations, adresses sources), les événements de sécurité des services (échecs de connexion, rejets de validation, signatures de webhook invalides) et les alertes du détecteur. Chaque échec de connexion indique si le compte visé existe, sans jamais journaliser les identifiants saisis. Cela suffit à distinguer un bourrage d'identifiants, qui vise surtout des comptes inconnus, d'une attaque ciblée sur un compte réel.</p>
+
+<h2>8.3 Consigne additionnelle 1 : authentification faciale et voyant connecté</h2>
+<p>L'accès protégé demande trois étapes dans l'ordre : identifiant, reconnaissance faciale, mot de passe. La reconnaissance (<code>services/face-auth</code>) utilise deux modèles OpenCV légers qui tournent sur CPU : YuNet détecte le visage et SFace en tire un gabarit de 128 valeurs. Le visage est comparé uniquement aux gabarits enregistrés pour l'identifiant saisi, soit une vérification 1:1, et la correspondance est acceptée à partir d'une similarité cosinus de 0,363. Ce parcours protège le back-office et, depuis le 22 octobre, la connexion du site de dons : le visage est enregistré à l'inscription et la page de connexion affiche l'état du voyant.</p>
+<p>En cas d'échec, l'identifiant est effacé et l'utilisateur dispose d'un seul nouvel essai. Au second échec, l'accès est bloqué 5 minutes, puis 10, puis 20 à chaque nouveau blocage. Le serveur refuse l'étape du mot de passe (403) si la reconnaissance n'a pas réussi dans les 120 secondes qui précèdent, ce qui empêche de sauter l'étape depuis le navigateur. Le mot de passe est vérifié par auth-service, qui reste seul à manipuler les secrets.</p>
+<p>Un ESP8266 connecté au hotspot affiche l'état sur une LED bicolore : vert clignotant quand le visage est reconnu, vert fixe 30 secondes quand l'accès est accordé, rouge fixe 30 secondes si le visage n'est pas reconnu, dix clignotements rouges si le mot de passe est faux. Le service n'envoie qu'un état et le microcontrôleur gère lui-même la temporisation, de sorte qu'une requête perdue ne fige pas le voyant.</p>
+<p>Les gabarits faciaux sont des données biométriques, donc sensibles au sens de l'article 9 du RGPD, même ici où elles sont fictives. Nous ne stockons aucune photo, seulement le gabarit ; les images de la caméra sont traitées en mémoire puis oubliées ; le gabarit est supprimé avec l'habilitation ; le service reste interne à l'hôte. L'extension au site de dons fait entrer des personnes extérieures dans ce traitement : en conditions réelles, il faudrait un consentement explicite et une connexion sans biométrie au choix. Trois écarts sont assumés et décrits dans <code>docs/governance/biometrie-rgpd.md</code> : pas de détection du vivant (une photo présentée à la caméra peut tromper le modèle), caméra capturée par le navigateur plutôt que par un pilote sur l'hôte, environnement de développement libre au lieu de CLion.</p>
+
+<!-- ============================== 9 ============================== -->
+<h1 id="s9">9. Analyse de risques EBIOS RM</h1>
+<p>Nous avons suivi les cinq ateliers de la méthode, avec le niveau de détail utile pour un démonstrateur. La gravité va de 1 (mineure) à 4 (critique) et la vraisemblance de V1 (peu vraisemblable) à V4 (quasi certaine).</p>
+
+<h2>9.1 Atelier 1 : cadrage et socle de sécurité</h2>
+<p>Nous retenons quatre valeurs métier : encaisser un don (VM1), garantir l'exactitude des transactions et du classement (VM2), protéger les données des donateurs (VM3) et réserver l'administration aux opérateurs habilités (VM4). Les biens supports sont les services de la figure 1, la base MariaDB, le poste hôte et son moteur Docker, le hotspot, et pour VM4 le service d'authentification faciale et sa base de gabarits.</p>
+<table>
+  <tr><th style="width:38%">Événement redouté</th><th style="width:9%">Valeur</th><th>Impacts</th><th class="c" style="width:6%">G</th></tr>
+  <tr><td>ER1. Les dons sont impossibles pendant plusieurs minutes</td><td>VM1</td><td>Collecte perdue en pleine campagne, image dégradée, incident majeur au sens de DORA.</td><td class="c">3</td></tr>
+  <tr><td>ER2. Des transactions sont faussées (payées sans paiement, statut erroné)</td><td>VM2</td><td>Fraude, classement faux, perte de confiance du partenaire de paiement.</td><td class="c">4</td></tr>
+  <tr><td>ER3. La base des donateurs fuit</td><td>VM3</td><td>Violation de données personnelles à notifier, atteinte à l'image.</td><td class="c">3</td></tr>
+  <tr><td>ER4. Un tiers prend la main sur le back-office</td><td>VM4</td><td>Toutes les autres valeurs deviennent atteignables.</td><td class="c">4</td></tr>
+  <tr><td>ER5. Les gabarits biométriques fuient</td><td>VM4</td><td>Donnée sensible qu'on ne peut pas changer comme un mot de passe.</td><td class="c">3</td></tr>
+  <tr><td>ER6. La supervision est aveuglée</td><td>VM1, VM2</td><td>Les autres événements passent inaperçus.</td><td class="c">2</td></tr>
+</table>
+<p>Le socle de sécurité reprend les règles d'hygiène de base : cloisonnement réseau, exposition minimale, journalisation centralisée, secrets hors du code, authentification forte pour l'administration.</p>
+
+<h2>9.2 Atelier 2 : sources de risque</h2>
+<table>
+  <tr><th style="width:30%">Source de risque</th><th>Objectif visé</th><th style="width:14%">Pertinence</th></tr>
+  <tr><td>Cybercriminel organisé</td><td>Gain financier : fraude au paiement, revente de données.</td><td>Élevée</td></tr>
+  <tr><td>Hacktiviste</td><td>Faire tomber le site pendant la campagne Octobre Rose pour lui nuire.</td><td>Élevée</td></tr>
+  <tr><td>Fraudeur opportuniste</td><td>Tester des cartes volées, gonfler un classement.</td><td>Moyenne</td></tr>
+  <tr><td>Initié ou opérateur malveillant</td><td>Détourner le back-office, extraire des données.</td><td>Moyenne</td></tr>
+</table>
+<p>L'attaquant du laboratoire joue tour à tour les trois premiers profils. L'initié n'est pas simulé, mais c'est lui qui justifie l'authentification forte du back-office.</p>
+
+<h2>9.3 Atelier 3 : scénarios stratégiques</h2>
+<p>L'écosystème compte peu de parties prenantes : le prestataire de paiement (simulé ici), les opérateurs du back-office, le poste hôte qui porte toute la plateforme et les fournisseurs de composants (images Docker, paquets npm et Python). Quatre scénarios stratégiques en découlent.</p>
+<ul>
+  <li>SS1. Un hacktiviste sature le paiement pendant la campagne (ER1).</li>
+  <li>SS2. Un cybercriminel fausse des transactions en forgeant ou en rejouant des confirmations de paiement (ER2).</li>
+  <li>SS3. Un cybercriminel compromet des comptes de donateurs par bourrage d'identifiants, puis aspire historiques et classement (ER3).</li>
+  <li>SS4. Un initié, ou un attaquant qui a obtenu le mot de passe d'un opérateur, tente d'entrer avec une photo de sa victime (ER4, ER5).</li>
+</ul>
+<p>Le risque lié aux fournisseurs de composants est identifié mais peu traité dans ce prototype, en dehors du choix d'images officielles dont la version est indiquée.</p>
+
+<h2>9.4 Atelier 4 : scénarios opérationnels</h2>
+<table>
+  <tr><th style="width:9%">Scénario</th><th style="width:39%">Mode opératoire</th><th>Point de détection</th><th class="c" style="width:6%">V</th></tr>
+  <tr><td>SO1 (SS1)</td><td>Flood concurrent sur le paiement depuis trois adresses (<code>availability</code>).</td><td>429 au WAF ; débit, latence p95 et part de la première adresse dans le détecteur.</td><td class="c">V3</td></tr>
+  <tr><td>SO2 (SS3)</td><td>Bourrage d'identifiants sur <code>/api/auth/login</code> (<code>auth-abuse</code>).</td><td><code>login_failed</code> au SOC ; taux d'échecs d'authentification.</td><td class="c">V3</td></tr>
+  <tr><td>SO3 (SS3)</td><td>Aspiration du classement à haute fréquence (<code>scraping</code>).</td><td>Concentration du trafic sur une route et une adresse.</td><td class="c">V3</td></tr>
+  <tr><td>SO4 (SS3)</td><td>Lecture massive de l'historique avec des comptes valides (<code>exfiltration</code>).</td><td>Octets sortants par fenêtre.</td><td class="c">V2</td></tr>
+  <tr><td>SO5 (SS2)</td><td>Injection dans les champs de connexion et de paiement (<code>injection</code>).</td><td>403 du WAF, rafale de 400.</td><td class="c">V2</td></tr>
+  <tr><td>SO6 (SS2)</td><td>Webhook forgé ou rejoué vers <code>/api/donations/webhook</code>.</td><td><code>webhook_invalid_signature</code> au SOC.</td><td class="c">V1</td></tr>
+  <tr><td>SO7 (SS4)</td><td>Photo de l'opérateur devant la caméra et mot de passe volé.</td><td>Non détecté par le modèle ; blocage après deux échecs.</td><td class="c">V2</td></tr>
+</table>
+<p>Les cinq premiers scénarios correspondent aux scripts de <code>redteam/attacks.py</code> et ont été joués. SO6 et SO7 sont analysés mais pas scriptés.</p>
+
+<h2>9.5 Atelier 5 : traitement du risque</h2>
+<table>
+  <tr><th style="width:12%">Risque</th><th class="c" style="width:8%">Avant</th><th style="width:33%">Mesures</th><th class="c" style="width:8%">Après</th><th>Risque résiduel</th></tr>
+  <tr><td>ER1 par SO1</td><td class="c">3 / V3</td><td>Limitation par adresse au WAF, alerte en 10 à 15 s, redémarrage automatique.</td><td class="c">3 / V2</td><td>Une attaque répartie sur beaucoup d'adresses contourne la limite par adresse.</td></tr>
+  <tr><td>ER2 par SO5, SO6</td><td class="c">4 / V2</td><td>Requêtes paramétrées, validation, HMAC comparé en temps constant, WAF.</td><td class="c">4 / V1</td><td>Le corps signé n'a ni horodatage ni nonce : un webhook capturé peut être rejoué, sans effet tant que le statut ne change pas.</td></tr>
+  <tr><td>ER3 par SO2 à SO4</td><td class="c">3 / V3</td><td>bcrypt, message d'erreur neutre, limitation au WAF, détection sur les échecs et le volume sortant.</td><td class="c">3 / V2</td><td>Pas de verrouillage de compte dans auth-service ; une extraction lente reste sous le seuil.</td></tr>
+  <tr><td>ER4 par SO7</td><td class="c">4 / V2</td><td>Trois facteurs, blocage progressif, contrôle côté serveur.</td><td class="c">4 / V2</td><td>Pas de détection du vivant.</td></tr>
+  <tr><td>ER5</td><td class="c">3 / V2</td><td>Aucune photo stockée, service interne, suppression à la révocation.</td><td class="c">3 / V1</td><td>Fichier de gabarits non chiffré sur l'hôte.</td></tr>
+  <tr><td>ER6</td><td class="c">2 / V2</td><td>WAF comme source principale, redémarrage automatique de la chaîne.</td><td class="c">2 / V2</td><td>Le WAF et l'hôte restent des points uniques.</td></tr>
+</table>
+<p>Les risques résiduels les plus lourds sont ER2 et ER4, de gravité 4. Nous les acceptons pour le démonstrateur. Une mise en production demanderait au minimum un horodatage signé dans le webhook et une détection du vivant pour l'authentification faciale.</p>
+
+<!-- ============================== 10 ============================== -->
+<h1 id="s10">10. PCA / PRA</h1>
+<h2>10.1 Activités critiques</h2>
+<p>L'activité critique est l'encaissement des dons. Elle repose sur la chaîne WAF, payment-api, psp-simulator et MariaDB. auth-service pèse moins qu'il n'y paraît : un don anonyme avec une simple adresse e-mail reste possible quand l'authentification tombe, ce qui offre un mode dégradé acceptable. La chaîne de supervision (Promtail, Loki, Prometheus, Grafana, détecteur) n'est pas nécessaire pour encaisser, mais sans elle les incidents deviennent invisibles. L'assistant RAG n'est pas critique.</p>
+
+<h2>10.2 Objectifs de reprise</h2>
+<table>
+  <tr><th style="width:15%">Service</th><th style="width:17%">Incident</th><th style="width:20%">RTO visé</th><th style="width:20%">RPO</th><th>Mécanisme</th></tr>
+  <tr><td>Encaissement</td><td>Saturation par quelques adresses</td><td>Service maintenu pour les autres donateurs ; normal moins d'une minute après la fin de l'attaque</td><td>0</td><td>Limitation au WAF ; retour à RESOLVED après 3 fenêtres normales.</td></tr>
+  <tr><td>payment-api, auth-service</td><td>Arrêt ou plantage</td><td>1 min</td><td>0</td><td>Redémarrage automatique ; transactions validées en base.</td></tr>
+  <tr><td>psp-simulator</td><td>Redémarrage</td><td>1 min</td><td>Sessions ouvertes perdues ; dons concernés laissés en <code>pending</code></td><td>Redémarrage automatique ; le donateur relance son don.</td></tr>
+  <tr><td>MariaDB</td><td>Arrêt du conteneur</td><td>2 min</td><td>0</td><td>Redémarrage automatique, contrôle de santé, journal InnoDB.</td></tr>
+  <tr><td>MariaDB</td><td>Perte du volume</td><td>Non couvert automatiquement</td><td>Depuis l'initialisation</td><td>PRA manuel : recréer le schéma depuis <code>infra/db/init/</code>.</td></tr>
+  <tr><td>Supervision</td><td>Arrêt d'un composant</td><td>2 min</td><td>Journaux de la coupure perdus</td><td>Redémarrage automatique ; le détecteur recrée son modèle s'il manque.</td></tr>
+  <tr><td>Assistant RAG</td><td>Ollama indisponible</td><td>Sans objectif</td><td>Sans objet</td><td>Démarre quand même et répond quand Ollama revient.</td></tr>
+</table>
+<p>Ces RTO sont des objectifs. Seul le délai de détection (10 à 15 s) a été mesuré ; les durées de redémarrage dépendent du PC Hôte et se vérifient pendant la répétition de la démonstration.</p>
+
+<h2>10.3 Scénarios couverts et non couverts</h2>
+<p>La reprise automatique couvre l'arrêt d'un conteneur, la saturation par un petit nombre d'adresses, les attaques applicatives arrêtées par le WAF et la validation, et le redémarrage complet de l'hôte, après lequel Docker relance les conteneurs. Elle ne couvre pas la perte du PC Hôte (il n'existe pas de second site), la perte du volume de la base, une attaque répartie sur un grand nombre d'adresses, ni une compromission avérée, qui exige une investigation avant toute remise en service.</p>
+
+<h2>10.4 Responsabilités</h2>
+<table>
+  <tr><th style="width:24%">Acteur</th><th>Rôle dans la reprise</th></tr>
+  <tr><td>WAF et Docker</td><td>Absorber la charge, redémarrer les services.</td></tr>
+  <tr><td>Détecteur</td><td>Détecter, qualifier la catégorie, confirmer le retour à la normale (RESOLVED).</td></tr>
+  <tr><td>Opérateur de l'équipe</td><td>Suivre Grafana et le SOC, valider la reprise en refaisant un don, appliquer le runbook, décider de l'escalade vers un coach.</td></tr>
+  <tr><td>Assistant RAG</td><td>Expliquer l'alerte et retrouver la procédure, sans aucune action sur le système.</td></tr>
+  <tr><td>Équipe</td><td>Analyse après incident, ajustement des règles du WAF, réentraînement du modèle.</td></tr>
+</table>
+
+<h2>10.5 Risques résiduels après reprise</h2>
+<p>Trois points restent ouverts. Le PSP ne relance pas un webhook qui échoue : si payment-api est arrêté au moment de la confirmation, la transaction reste <code>pending</code> alors que le PSP la considère payée, et seul un rapprochement permet de corriger. Un redémarrage du PSP fait perdre les sessions en cours. Enfin, toute la plateforme repose sur un seul hôte.</p>
+
+<!-- ============================== 11 ============================== -->
+<h1 id="s11">11. NIS2 et DORA</h1>
+<p>Xijin Pink jouerait le rôle d'un établissement de paiement. Pour une entité financière, le texte de référence en matière de risque informatique et de notification des incidents est DORA, le règlement (UE) 2022/2554, applicable depuis le 17 janvier 2025. La directive NIS2 (UE) 2022/2555 le reconnaît comme acte sectoriel : pour ces entités, ses obligations équivalentes s'effacent devant DORA. Elle reste néanmoins le cadre général de la cybersécurité européenne et continue de s'appliquer à d'autres acteurs de la chaîne, comme les fournisseurs de services numériques. Notre prototype a été construit en quatre jours ; nous séparons donc ce qu'il démontre de ce qu'il ne peut pas démontrer.</p>
+<table>
+  <tr><th style="width:19%">Exigence</th><th style="width:43%">Ce que le démonstrateur montre</th><th>Ce qu'il ne peut pas montrer</th></tr>
+  <tr><td>DORA, gestion du risque TIC (art. 5 à 16)</td><td>Cartographie des actifs et des flux (figure 1, EBIOS RM), protection (WAF, validation, secrets hors du code), détection des activités anormales demandée par l'article 10, procédures de réponse (runbooks).</td><td>Politique validée par l'organe de direction, sauvegardes testées (art. 12), revue annuelle du cadre.</td></tr>
+  <tr><td>DORA, incidents (art. 17 à 23)</td><td>Alertes horodatées, classées par catégorie et sévérité, journaux corrélés : la matière d'une qualification et d'une chronologie.</td><td>Classification selon les critères réglementaires et notification à l'ACPR : 4 h après le classement en incident majeur et au plus tard 24 h après la détection, rapport intermédiaire sous 72 h, rapport final sous un mois.</td></tr>
+  <tr><td>DORA, tests de résilience (art. 24 à 27)</td><td>Campagne d'attaques scriptée, rejouable après chaque modification.</td><td>Tests de pénétration fondés sur la menace (TLPT) menés par des testeurs indépendants.</td></tr>
+  <tr><td>DORA, prestataires tiers (art. 28 à 44)</td><td>Dépendance au PSP identifiée et documentée (sessions, webhook).</td><td>Contrats, registre d'information, stratégie de sortie.</td></tr>
+  <tr><td>NIS2, mesures de l'article 21</td><td>Analyse de risques, gestion des incidents, continuité, authentification multifacteur, cryptographie (bcrypt, HMAC).</td><td>Sécurité de la chaîne d'approvisionnement, formation, sécurité liée aux ressources humaines.</td></tr>
+  <tr><td>NIS2, gouvernance (art. 20) et notification (art. 23)</td><td>Les horodatages permettent de tenir l'alerte précoce sous 24 h, la notification sous 72 h et le rapport final sous un mois.</td><td>Engagement et formation de la direction, relation avec le CSIRT.</td></tr>
+</table>
+
+<h2>Posture de conseil</h2>
+<p>Si nous devions conseiller la direction de Xijin Pink, nous lui proposerions les arbitrages suivants, par ordre de priorité, chacun appuyé sur un élément vérifiable de la démonstration.</p>
+<ol>
+  <li>Garder la détection par apprentissage, qui a repéré les cinq catégories d'attaque en moins de 15 secondes, mais exiger une mesure des fausses alertes par heure avant de lui confier des actions automatiques.</li>
+  <li>Mettre en place une sauvegarde chiffrée de la base, restaurée à blanc régulièrement. C'est la seule façon de donner un RPO à la perte du volume (DORA, art. 12).</li>
+  <li>Ajouter la relance du webhook et un rapprochement quotidien entre le PSP et payment-api, pour qu'aucune transaction ne reste en suspens après un incident.</li>
+  <li>Passer au jeu de règles OWASP CRS et prévoir une protection contre les attaques réparties en amont du WAF.</li>
+  <li>Chiffrer les secrets (SOPS ou Vault) et fermer tous les accès d'administration anonymes.</li>
+  <li>Écrire la procédure de notification : qui qualifie l'incident, qui notifie, dans quels délais. Les horodatages des alertes fournissent déjà la chronologie.</li>
+</ol>
+
+<!-- ============================== 12 ============================== -->
+<h1 id="s12">12. Contributions de l'équipe</h1>
+<table>
+  <tr><th style="width:17%">Membre</th><th style="width:14%">Rôle</th><th>Réalisations visibles dans le dépôt</th></tr>
+  <tr><td>Julien Demogue</td><td>Services et API</td><td>Structure du dépôt et architecture de départ ; auth-service, payment-api et psp-simulator (Node.js, OpenAPI, tests) ; schéma MariaDB ; intégration de l'authentification faciale et du voyant dans les pages d'inscription et de connexion du site.</td></tr>
+  <tr><td>Louis Marec</td><td>IA et données</td><td>Détecteur d'anomalies (indicateurs, modèle à deux étages, évaluation, scorer en ligne) et assistant RAG ; télémétrie des services et chaîne Loki, Prometheus, Grafana ; campagnes red team et export des jeux de données ; WAF et tableau SOC ; service d'authentification faciale et firmware ESP8266 ; scripts de démarrage.</td></tr>
+  <tr><td>Eric Girard</td><td>Infrastructure</td><td>Orchestration Docker Compose (réseau interne, volumes, contrôle de santé MariaDB, phpMyAdmin) ; conteneurisation du frontend ; configuration CORS des services ; documentation d'infrastructure.</td></tr>
+  <tr><td>Noé Filippi et Sterenn</td><td>Frontend</td><td>Application React et Tailwind : accueil, don, retour de paiement, classement, historique, profil, connexion et inscription ; formulaire de paiement par carte de test ; branchement aux API.</td></tr>
+</table>
+<p class="small">Les réalisations sont tirées de l'historique Git du projet (pull requests 1 à 8).</p>
+
+<!-- ============================== 13 ============================== -->
+<h1 id="s13">13. Limites et suites</h1>
+<p>Quelques points restent ouverts, et nous préférons les nommer.</p>
+<ul>
+  <li>Le détecteur transmet ses alertes à <code>REMEDIATION_URL</code>, mais l'automate qui doit les recevoir n'est pas encore dans le dépôt ; les réponses par catégorie sont pour l'instant décrites dans les runbooks.</li>
+  <li>Le rôle anonyme de Grafana a les droits d'administration. Il doit passer en simple lecture avant d'exposer le tableau sur le hotspot.</li>
+  <li>Le frontend est servi par le serveur de développement Vite ; une image de production servirait des fichiers statiques.</li>
+  <li>Pas de sauvegarde planifiée de la base ni de relance du webhook (section 10).</li>
+  <li>Le taux de fausses alertes du détecteur sur du trafic normal n'est pas encore chiffré.</li>
+  <li>Pas de détection du vivant pour l'authentification faciale.</li>
+</ul>
+
+<!-- ============================== ANNEXES ============================== -->
+<h1 id="sA" class="newpage" style="margin-top:0">Annexe A. Renvois vers le dépôt</h1>
+<table>
+  <tr><th style="width:42%">Chemin</th><th>Contenu</th></tr>
+  <tr><td><code>README.md</code>, <code>scripts/README.md</code></td><td>Démarrage, vérification et arrêt de la plateforme.</td></tr>
+  <tr><td><code>docs/architecture.md</code></td><td>Composants, flux, matrice d'exposition.</td></tr>
+  <tr><td><code>docs/payment-flow.md</code></td><td>Parcours de paiement et webhook signé.</td></tr>
+  <tr><td><code>docs/api/telemetry-contract.md</code></td><td>Ce que chaque service doit journaliser et exposer.</td></tr>
+  <tr><td><code>docs/api/alert-contract.md</code></td><td>Format des alertes et réponse attendue par catégorie.</td></tr>
+  <tr><td><code>docs/runbooks/</code></td><td>Procédures par type d'incident (corpus de l'assistant RAG).</td></tr>
+  <tr><td><code>docs/governance/</code></td><td>EBIOS RM, PCA/PRA, NIS2/DORA, biométrie et RGPD, source de ce dossier.</td></tr>
+  <tr><td><code>infra/docker/docker-compose.yml</code></td><td>Orchestration de toute la plateforme.</td></tr>
+  <tr><td><code>infra/db/init/01-schema.sql</code></td><td>Schéma de la base.</td></tr>
+  <tr><td><code>infra/observability/</code></td><td>Configuration de Prometheus, Loki et Promtail, tableaux Grafana.</td></tr>
+  <tr><td><code>services/waf/</code></td><td>Règles du WAF et chemin de migration vers l'OWASP CRS.</td></tr>
+  <tr><td><code>services/auth-service/</code>, <code>payment-api/</code>, <code>psp-simulator/</code></td><td>Services métier et leurs tests.</td></tr>
+  <tr><td><code>ai/anomaly-detection/</code> (voir <code>DOMAIN.md</code>)</td><td>Conception, code, tests et scorer en ligne du détecteur.</td></tr>
+  <tr><td><code>ai/rag-assistant/</code></td><td>Assistant opérateur.</td></tr>
+  <tr><td><code>redteam/</code>, <code>tools/</code></td><td>Scénarios d'attaque, trafic normal, export des jeux de données.</td></tr>
+  <tr><td><code>services/face-auth/</code>, <code>iot/esp8266-led/</code></td><td>Authentification faciale, back-office et voyant connecté.</td></tr>
+  <tr><td><code>frontend/</code></td><td>Site de dons.</td></tr>
+</table>
+
+<h1 id="sB">Annexe B. Démarrer et vérifier la plateforme</h1>
+<p>Prérequis : Docker avec le démon lancé. Ollama est facultatif et ne sert qu'aux réponses de l'assistant RAG.</p>
+<pre>./scripts/start.sh            # Linux, macOS, Git Bash  (Windows : .\scripts\start.ps1)
+./scripts/verify.sh           # contrôle des 11 points de santé
+./scripts/stop.sh             # arrêt (--volumes pour effacer aussi les données)</pre>
+<p>Une fois la plateforme démarrée :</p>
+<table>
+  <tr><th style="width:42%">Adresse</th><th>Usage</th></tr>
+  <tr><td><code>http://192.168.137.1:8080</code></td><td>Site de dons, via le WAF</td></tr>
+  <tr><td><code>http://192.168.137.1:3000/d/xijin-resilience</code></td><td>Tableau de supervision (avant, pendant, après)</td></tr>
+  <tr><td><code>http://192.168.137.1:3000/d/xijin-soc</code></td><td>Tableau SOC / SIEM</td></tr>
+  <tr><td><code>http://localhost:3005</code></td><td>Back-office avec authentification faciale (sur l'hôte)</td></tr>
+  <tr><td><code>http://localhost:3020</code></td><td>Assistant RAG (sur l'hôte)</td></tr>
+</table>
+<p>Pour rejouer l'incident depuis le PC Attaquant :</p>
+<pre>XIJIN_PAY=http://192.168.137.1:8080 python redteam/campaign.py --only availability</pre>
+<p>Pour reproduire l'apprentissage du détecteur sur données réelles, la procédure complète (campagne, export Loki, entraînement, évaluation) est décrite dans <code>ai/anomaly-detection/README.md</code>.</p>
+
+</body>
+</html>
