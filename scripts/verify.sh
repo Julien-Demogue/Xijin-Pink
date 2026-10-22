@@ -2,9 +2,15 @@
 # Quick health check of the running platform.
 set -uo pipefail
 ok=0; fail=0
+TRIES="${VERIFY_TRIES:-10}"   # retries to ride out first-start warmup (DB schema, etc.)
 check() {
   local name="$1" url="$2" exp="${3:-200}"
-  local code; code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$url" 2>/dev/null || echo 000)
+  local code=000 i
+  for i in $(seq 1 "$TRIES"); do
+    code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$url" 2>/dev/null || echo 000)
+    [ "$code" = "$exp" ] && break
+    sleep 3
+  done
   if [ "$code" = "$exp" ]; then echo "  OK   $name ($code)"; ok=$((ok+1))
   else echo "  FAIL $name ($code, attendu $exp) — $url"; fail=$((fail+1)); fi
 }
