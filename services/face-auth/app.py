@@ -13,6 +13,7 @@ import os
 import time
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
@@ -26,6 +27,16 @@ RECOGNIZED_TTL = float(os.environ.get("FACE_RECOGNIZED_TTL", "120"))  # seconds
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI(title="Xijin-Pink face-auth back-office")
+
+# Allow the donor front (its own origin, e.g. http://localhost:5173) to call the
+# identify/password endpoints. No credentials are used (token travels in the body).
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 recognizer = FaceRecognizer()
 store = Store()
 flow = AuthFlow()

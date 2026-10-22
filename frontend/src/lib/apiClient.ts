@@ -5,6 +5,7 @@ import type { DonationSummary } from "@/types/summary";
 
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL ?? "http://localhost:3001";
 const PAYMENT_API_URL = import.meta.env.VITE_PAYMENT_API_URL ?? "http://localhost:3002";
+const FACE_API_URL = import.meta.env.VITE_FACE_API_URL ?? "http://localhost:3005";
 
 const TOKEN_STORAGE_KEY = "xijinpink_token";
 
@@ -149,4 +150,64 @@ export async function donationsLeaderboard(): Promise<LeaderboardEntry[]> {
     "/api/donations/leaderboard",
   );
   return leaderboard;
+}
+
+// --- face-auth ---
+
+export interface FaceIdentifyResult {
+  recognized: boolean;
+  score?: number;
+  locked?: boolean;
+  lockedForSeconds?: number;
+  attemptsLeft?: number;
+  reason?: string;
+}
+
+export interface FacePasswordResult {
+  ok: boolean;
+  token?: string;
+  error?: string;
+  restart?: boolean;
+}
+
+// face-auth answers with 200 for both recognized/not-recognized and 403 when the
+// face gate was not passed, so the caller needs the status — don't throw on it.
+async function faceRequest<T>(path: string, body: unknown): Promise<{ status: number; data: T }> {
+  let response: Response;
+  try {
+    response = await fetch(`${FACE_API_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError("Service de reconnaissance faciale injoignable.", 0);
+  }
+  const data = (await response.json().catch(() => ({}))) as T;
+  return { status: response.status, data };
+}
+
+export function faceIdentify(
+  input: { identifier: string; image: string },
+): Promise<{ status: number; data: FaceIdentifyResult }> {
+  return faceRequest<FaceIdentifyResult>("/identify", input);
+}
+
+export function facePassword(
+  input: { identifier: string; password: string },
+): Promise<{ status: number; data: FacePasswordResult }> {
+  return faceRequest<FacePasswordResult>("/password", input);
+}
+
+export interface FaceEnrollResult {
+  enrolled?: boolean;
+  samples?: number;
+  error?: string;
+  message?: string;
+}
+
+export function faceEnroll(
+  input: { identifier: string; image: string; displayName?: string; role?: string },
+): Promise<{ status: number; data: FaceEnrollResult }> {
+  return faceRequest<FaceEnrollResult>("/enroll", input);
 }

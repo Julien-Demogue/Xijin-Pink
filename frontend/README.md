@@ -17,7 +17,10 @@ classement viennent de l'API.
   `/don/retour`
 - Historique des transactions + total donné et titre (compte connecté)
 - Classement des donateurs avec titres (table `titles`, résolus par l'API)
-- Création de compte / connexion (JWT via `auth-service`)
+- Création de compte / connexion **en deux étapes** : reconnaissance faciale
+  (service `face-auth`) puis mot de passe, avec un **simulateur de LED** à l'écran
+  (éteinte → vert clignotant quand le visage est reconnu → vert fixe si le mot de
+  passe est bon, rouge fixe sinon). Le JWT vient d'`auth-service`.
 - Édition du profil (nom, bio — l'email n'est pas modifiable)
 
 ## Démarrer
@@ -31,10 +34,20 @@ npm install
 npm run dev             # http://localhost:5173
 ```
 
-`.env` pointe par défaut vers `auth-service` (`:3001`) et `payment-api`
-(`:3002`) en local. Sans backend démarré, les pages qui appellent l'API
-(don, historique, classement, connexion...) afficheront une erreur réseau
-explicite plutôt que de planter.
+`.env` pointe par défaut vers `auth-service` (`:3001`), `payment-api`
+(`:3002`) et `face-auth` (`:3005`) en local. Sans backend démarré, les pages qui
+appellent l'API (don, historique, classement, connexion...) afficheront une
+erreur réseau explicite plutôt que de planter.
+
+### Connexion par reconnaissance faciale
+
+La page de connexion appelle le service `face-auth` (`VITE_FACE_API_URL`,
+`:3005` par défaut), qui doit tourner et avoir le visage **enrôlé** pour
+l'email saisi (panneau d'enrôlement du back-office `face-auth`, voir
+[services/face-auth/README.md](../services/face-auth/README.md)). Sans visage
+enrôlé, l'identification échoue (LED rouge) — c'est le comportement attendu.
+Le mot de passe est vérifié par `face-auth`, qui le délègue à `auth-service` et
+renvoie le même JWT.
 
 ## Autres commandes
 
