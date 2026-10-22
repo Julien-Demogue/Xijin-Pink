@@ -32,6 +32,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<AuthResult>;
+  loginWithToken: (token: string) => Promise<AuthResult>;
   register: (input: { email: string; password: string; displayName: string }) => Promise<AuthResult>;
   logout: () => void;
   updateProfile: (input: { displayName: string; bio?: string }) => Promise<AuthResult>;
@@ -62,6 +63,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCurrentUser(user);
       return { ok: true };
     } catch (error) {
+      return { ok: false, error: errorMessage(error) };
+    }
+  }, []);
+
+  // Adopt a session from a token obtained elsewhere (e.g. the face-auth flow,
+  // which delegates the password check to auth-service and returns the same JWT).
+  const loginWithToken = useCallback(async (token: string): Promise<AuthResult> => {
+    try {
+      setToken(token);
+      const user = await authGetProfile();
+      setCurrentUser(user);
+      return { ok: true };
+    } catch (error) {
+      clearToken();
       return { ok: false, error: errorMessage(error) };
     }
   }, []);
@@ -105,11 +120,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: currentUser !== null,
       isLoading,
       login,
+      loginWithToken,
       register,
       logout,
       updateProfile,
     }),
-    [currentUser, isLoading, login, register, logout, updateProfile],
+    [currentUser, isLoading, login, loginWithToken, register, logout, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

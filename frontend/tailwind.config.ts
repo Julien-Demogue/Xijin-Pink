@@ -38,6 +38,15 @@ export default {
       boxShadow: {
         brand: "0 10px 30px -10px rgba(251, 92, 161, 0.45)",
       },
+      keyframes: {
+        "led-blink": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.15" },
+        },
+      },
+      animation: {
+        "led-blink": "led-blink 0.6s steps(1, end) infinite",
+      },
     },
   },
   plugins: [],
