@@ -27,6 +27,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse, PlainTextResponse
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, generate_latest
 
+from detector.bootstrap import ensure_model
 from detector.featurespec import FEATURES, WINDOW_S, extract_observations
 from detector.persistence import load
 from detector.resources import attach
@@ -117,6 +118,12 @@ class ScopeState:
 
 class Engine:
     def __init__(self):
+        # Fresh clone has no trained model (git-ignored) — train one from
+        # synthetic data so the detector works out of the box, no manual step.
+        if ensure_model(MODEL_DIR):
+            _log("info", "model_bootstrapped",
+                 note="trained from synthetic data (no real model found); "
+                      "run detector.train_eval on real campaign data to improve it")
         self.baseline = load(os.path.join(MODEL_DIR, "baseline.pkl"))
         try:
             self.stage2 = load(os.path.join(MODEL_DIR, "stage2.pkl"))

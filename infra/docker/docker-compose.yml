@@ -181,8 +181,10 @@ services:
       MODEL_DIR: /app/model_store
       # REMEDIATION_URL: http://remediation-engine:9000/alerts   # when it exists
     volumes:
-      # Model trained by `python -m detector.train_eval` (must exist first).
-      - ../../ai/anomaly-detection/model_store:/app/model_store:ro
+      # Model persisted here. On first start with none, the detector trains a
+      # synthetic bootstrap model into it; `detector.train_eval` overwrites it
+      # with a real one. Writable so the bootstrap can save.
+      - ../../ai/anomaly-detection/model_store:/app/model_store
     ports:
       - "3010:3010"
     depends_on:
